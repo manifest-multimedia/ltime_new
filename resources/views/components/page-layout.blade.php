@@ -30,6 +30,9 @@
 <link href="{{asset("assets/css/style.css")}}" rel="stylesheet" type="text/css">
 <link href="{{asset("assets/css/responsive.css")}}" rel="stylesheet" type="text/css">
 <livewire:styles />
+
+@vite(['resources/js/app.js', 'resources/css/app.css'])
+
 </head>
 
 

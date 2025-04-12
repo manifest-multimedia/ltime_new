@@ -20,7 +20,7 @@
                 <li class="{{ url()->current() === url('/properties') ? 'current' : ''}}"><a href="/properties"><span>Properties</span></a>
                     
                 </li> 
-                <li class="{{ url()->current() === url('/en/insights') ? 'current' : ''}}"><a href="/en/insights"><span>Insights</span></a></li>
+                <li class="{{ url()->current() === url('/en/insights') ? 'current' : ''}}"><a href="/insights"><span>Insights</span></a></li>
                 
                 <li class="{{ url()->current() === url('/contact-us') ? 'current' : ''}}"><a href="/contact-us"><span>Contact Us</span></a></li>   
             </ul>

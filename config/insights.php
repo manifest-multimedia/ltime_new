@@ -45,7 +45,7 @@ return [
     
     'captcha' => [
         'captcha_enabled' => true,
-        'captcha_type' => \BinshopsBlog\Captcha\Basic::class,
+        'captcha_type' => \App\Services\Insights\Captcha\BasicCaptcha::class,
         'basic_question' => "What is the opposite of white?",
         'basic_answers' => "black,dark",
     ],

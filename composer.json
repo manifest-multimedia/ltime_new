@@ -6,7 +6,6 @@
     "license": "MIT",
     "require": {
         "php": "^8.0.2",
-        "binshops/laravel-blog": "^9.3",
         "doctrine/dbal": "^3.6",
         "dougsisk/laravel-country-state": "^4.2",
         "guzzlehttp/guzzle": "^7.2",

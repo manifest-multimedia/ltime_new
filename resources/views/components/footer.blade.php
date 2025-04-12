@@ -38,12 +38,12 @@
                         @foreach (\App\Models\Insights\Post::where('is_published', true)->orderBy('posted_at', 'desc')->limit(2)->get() as $post)
                             <div class="post">
                                 <figure class="post-thumb">
-                                    <a href="{{ $post->translations->first()->url ?? '#' }}">
+                                    <a href="{{ route('insights.show', $post->translations->first()->slug) }}">
                                         <img src="{{ asset('insights_images/' . ($post->translations->first()->image_large ?? 'default.jpg')) }}" alt="{{ $post->translations->first()->title ?? 'No Title' }}">
                                     </a>
                                 </figure>
                                 <h5>
-                                    <a href="{{ $post->translations->first()->url ?? '#' }}">
+                                    <a href="{{ route('insights.show', $post->translations->first()->slug) }}">
                                         {{ $post->translations->first()->title ?? 'No Title' }}
                                     </a>
                                 </h5>

@@ -3,13 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use BinshopsBlog\Models\Artticle;
+use App\Models\Insights\Post as InsightsPost;
 
 class BlogController extends Controller
 {
    public function getPosts(){
-    
-        $articles=Article::published()->get();
-
+        $articles = InsightsPost::where('is_published', true)->get();
    }
 }

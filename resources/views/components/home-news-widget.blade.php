@@ -18,16 +18,16 @@
                     <div class="news-block-one wow fadeInUp animated" data-wow-delay="00ms" data-wow-duration="1500ms">
                         <div class="inner-box">
                             <div class="image-box">
-                                <figure class="image"><a href="{{ $post->translations->first()->url ?? '#' }}"><img src="{{ asset('insights_images/' . ($post->translations->first()->image_large ?? 'default.jpg')) }}" alt="{{ $post->translations->first()->title ?? 'No Title' }}"></a></figure>
+                                <figure class="image"><a href="{{ route('insights.show', $post->translations->first()->slug) }}"><img src="{{ asset('insights_images/' . ($post->translations->first()->image_large ?? 'default.jpg')) }}" alt="{{ $post->translations->first()->title ?? 'No Title' }}"></a></figure>
                                 <span class="category">Insights</span>
                             </div>
                             <div class="lower-content">
-                                <h4><a href="{{ $post->translations->first()->url ?? '#' }}">{!! $post->translations->first()->title ?? 'No Title' !!}</a></h4>
+                                <h4><a href="{{ route('insights.show', $post->translations->first()->slug) }}">{!! $post->translations->first()->title ?? 'No Title' !!}</a></h4>
                                 <ul class="post-info clearfix">
                                     <li>{{ $post->posted_at->format('M j, Y') }}</li>
                                 </ul>
                                 <div class="btn-box">
-                                    <a href="{{ $post->translations->first()->url ?? '#' }}" class="theme-btn btn-two">Read Full Article</a>
+                                    <a href="{{ route('insights.show', $post->translations->first()->slug) }}" class="theme-btn btn-two">Read Full Article</a>
                                 </div>
                             </div>
                         </div>

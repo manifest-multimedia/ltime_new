@@ -38,7 +38,7 @@ class InsightsAdminController extends Controller
             'title' => 'required',
             'post_body' => 'required',
             'slug' => 'required|unique:insights_post_translations,slug',
-            'lang_id' => 'required|exists:binshops_languages,id',
+            'lang_id' => 'required|exists:insights_languages,id',
             'categories' => 'array',
             'posted_at' => 'nullable|date',
             'image' => 'nullable|image',
@@ -88,7 +88,7 @@ class InsightsAdminController extends Controller
             'title' => 'required',
             'post_body' => 'required',
             'slug' => 'required|unique:insights_post_translations,slug,' . $post->id . ',post_id',
-            'lang_id' => 'required|exists:binshops_languages,id',
+            'lang_id' => 'required|exists:insights_languages,id',
             'categories' => 'array',
             'posted_at' => 'nullable|date',
             'image' => 'nullable|image',
@@ -181,7 +181,7 @@ class InsightsAdminController extends Controller
         $this->validate($request, [
             'category_name' => 'required',
             'slug' => 'required|unique:insights_category_translations,slug',
-            'lang_id' => 'required|exists:binshops_languages,id',
+            'lang_id' => 'required|exists:insights_languages,id',
         ]);
 
         $category = Category::create([
