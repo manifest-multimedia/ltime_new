@@ -69,5 +69,6 @@ class Kernel extends HttpKernel
         'TrackReferrals' => \App\Http\Middleware\TrackReferrals::class,
         'referral' => \Questocat\Referral\Http\Middleware\CheckReferral::class,
         'cors' => \App\Http\Middleware\CorsMiddleware::class,
+        'insights.admin' => \App\Http\Middleware\InsightsAdminAccess::class,
     ];
 }

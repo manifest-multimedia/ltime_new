@@ -10,12 +10,13 @@
         "doctrine/dbal": "^3.6",
         "dougsisk/laravel-country-state": "^4.2",
         "guzzlehttp/guzzle": "^7.2",
-        "laravel/framework": "^9.19",
+        "laravel/framework": "^10.0",
         "laravel/jetstream": "*",
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
         "livewire/livewire": "^2.11",
-        "questocat/laravel-referral": "^1.0"
+        "questocat/laravel-referral": "^1.0",
+        "tinymce/tinymce": "^7.8"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.8",
@@ -26,7 +27,7 @@
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^6.1",
         "phpunit/phpunit": "^9.5.10",
-        "spatie/laravel-ignition": "^1.0"
+        "spatie/laravel-ignition": "^2.0"
     },
     "autoload": {
         "files": ["app/Helpers/helper.php"],
