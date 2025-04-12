@@ -35,24 +35,20 @@
                         <div class="widget-title">
                             <h3>Insights</h3>
                         </div>
-                        @foreach (\BinshopsBlog\Models\BinshopsPost::orderBy("posted_at","desc")->limit(2)->get() as $item)
-                        @php
-                            $post=\BinshopsBlog\Models\BinshopsPostTranslation::find($item->id);
-                        @endphp
+                        @foreach (\App\Models\Insights\Post::where('is_published', true)->orderBy('posted_at', 'desc')->limit(2)->get() as $post)
                             <div class="post">
-                                <figure class="post-thumb"><a href="{{$post->url('en')}}"><img src="{{asset("blog_images/$post->image_large")}}" alt="{{$post->title}}"></a></figure>
-                                <h5><a href="{{$post->url('en')}}">{{$post->title}}</a></h5>
-                                {{-- <p>{{date($item->posted_at)}}</p> --}}
+                                <figure class="post-thumb">
+                                    <a href="{{ $post->translations->first()->url ?? '#' }}">
+                                        <img src="{{ asset('insights_images/' . ($post->translations->first()->image_large ?? 'default.jpg')) }}" alt="{{ $post->translations->first()->title ?? 'No Title' }}">
+                                    </a>
+                                </figure>
+                                <h5>
+                                    <a href="{{ $post->translations->first()->url ?? '#' }}">
+                                        {{ $post->translations->first()->title ?? 'No Title' }}
+                                    </a>
+                                </h5>
                             </div>
                         @endforeach
-                        <div class="post-inner">
-                            
-                            {{-- <div class="post">
-                                <figure class="post-thumb"><a href="blog-details.html"><img src="assets/images/resource/footer-post-2.jpg" alt=""></a></figure>
-                                <h5><a href="blog-details.html">Ways to Increase Trust</a></h5>
-                                <p>Mar 24, 2020</p>
-                            </div> --}}
-                        </div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6 col-sm-12 footer-column">
