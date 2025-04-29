@@ -5,10 +5,10 @@
         <i class="icon-bar"></i>
         <i class="icon-bar"></i>
     </div>
-    <nav class="main-menu navbar-expand-md navbar-light">
-        <div class="collapse navbar-collapse show clearfix" id="navbarSupportedContent">
+    <nav class="main-menu navbar-expand-md navbar-dark">
+        <div class=" navbar-collapse show clearfix" id="navbarSupportedContent">
             <ul class="navigation clearfix">
-                <li class="{{ url()->current() === url('/') ? 'current' : ''}}"><a href="/"><span class="text-black">Home</span></a>
+                <li class="{{ url()->current() === url('/') ? 'current' : ''}}"><a href="/"><span>Home</span></a>
                    
                 </li>
                 <li class="{{ url()->current() === url('/our-company') ? 'current' : ''}}"><a href="/our-company"><span>About Us</span></a>

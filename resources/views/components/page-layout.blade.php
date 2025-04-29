@@ -81,7 +81,7 @@
 
 
         <!-- main header -->
-        <header class="main-header">
+        <header class="main-header header-style-one">
             <!-- header-top -->
             <div class="header-top">
                 <div class="top-inner clearfix">
@@ -137,6 +137,7 @@
                         <div class="menu-area clearfix">
                             <nav class="main-menu clearfix">
                                 <!--Keep This Empty / Menu will come through Javascript-->
+                                
                             </nav>
                         </div>
                         <div class="btn-box">
