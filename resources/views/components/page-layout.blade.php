@@ -118,8 +118,9 @@
                 <div class="outer-box">
                     <div class="main-box">
                         <div class="logo-box">
-                            <figure class="logo"><a href="{{url('/')}}"><img src="assets/images/logo.png" alt=""></a></figure>
+                            <figure class="logo"><a href="{{url('/')}}"><img src="{{asset('assets/images/logo.png')}}" alt="L-Time Properties Logo"></a></figure>
                         </div>
+                        
                         <x-navigation /> 
                        
                     </div>
@@ -131,7 +132,7 @@
                 <div class="outer-box">
                     <div class="main-box">
                         <div class="logo-box">
-                            <figure class="logo"><a href="#"><img src="assets/images/logo.png" alt=""></a></figure>
+                            <figure class="logo"><a href="{{url('/')}}"><img src="{{asset('assets/images/logo.png')}}" alt="L-Time Properties Logo"></a></figure>
                         </div>
                         <div class="menu-area clearfix">
                             <nav class="main-menu clearfix">
@@ -168,4 +169,4 @@
         <!-- subscribe-section end -->
 
         <!-- main-footer -->
-        <x-footer /> 
+        <x-footer />
