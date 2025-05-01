@@ -252,17 +252,15 @@ class InsightsAdminController extends Controller
         return view('insights.admin.comments.index', compact('comments'));
     }
 
-    public function approveComment($id)
+    public function approveComment(Comment $comment)
     {
-        $comment = Comment::findOrFail($id);
         $comment->update(['approved' => true]);
 
         return redirect()->back()->with('success', 'Comment approved successfully');
     }
 
-    public function deleteComment($id)
+    public function deleteComment(Comment $comment)
     {
-        $comment = Comment::findOrFail($id);
         $comment->delete();
 
         return redirect()->back()->with('success', 'Comment deleted successfully');
