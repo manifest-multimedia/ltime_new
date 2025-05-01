@@ -3,29 +3,44 @@
 @section('title', 'Create Category')
 
 @section('content')
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-                <form action="{{ route('insights.admin.categories.store') }}" method="POST">
-                    @csrf
-                    <div class="p-6">
-                        <div class="flex justify-between items-center mb-6">
-                            <h1 class="text-2xl font-semibold">Create New Category</h1>
-                            <div class="flex space-x-3">
-                                <a href="{{ route('insights.admin.categories') }}" 
-                                   class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700">
-                                    Cancel
-                                </a>
-                                <button type="submit"
-                                        class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:outline-none focus:border-blue-700 focus:ring focus:ring-blue-200 active:bg-blue-600 disabled:opacity-25 transition">
-                                    Create Category
-                                </button>
+    <div class="row layout-top-spacing">
+        <div class="col-12">
+            <div class="widget">
+                <div class="widget-content widget-content-area">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4>Create New Category</h4>
+                        <a href="{{ route('insights.admin.categories') }}" class="btn btn-secondary">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left mr-2">
+                                <line x1="19" y1="12" x2="5" y2="12"></line>
+                                <polyline points="12 19 5 12 12 5"></polyline>
+                            </svg>
+                            Back to Categories
+                        </a>
+                    </div>
+
+                    <form action="{{ route('insights.admin.categories.store') }}" method="POST">
+                        @csrf
+                        <div class="card">
+                            <div class="card-body">
+                                @include('insights.admin.categories._form')
+
+                                <div class="d-flex justify-content-end mt-4">
+                                    <a href="{{ route('insights.admin.categories') }}" class="btn btn-outline-secondary mr-2">
+                                        Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-save mr-2">
+                                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                            <polyline points="7 3 7 8 15 8"></polyline>
+                                        </svg>
+                                        Create Category
+                                    </button>
+                                </div>
                             </div>
                         </div>
-
-                        @include('insights.admin.categories._form')
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

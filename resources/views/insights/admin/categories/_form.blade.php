@@ -1,30 +1,36 @@
-<div class="space-y-6">
-    <div>
-        <label for="category_name" class="block text-sm font-medium text-gray-700">Category Name *</label>
+<div class="form-row">
+    <div class="col-md-6 mb-4">
+        <label for="category_name">Category Name *</label>
         <input type="text" name="category_name" id="category_name" 
                value="{{ old('category_name', $category->translations->first()->category_name ?? '') }}"
                required
-               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+               class="form-control">
     </div>
 
-    <div>
-        <label for="slug" class="block text-sm font-medium text-gray-700">Slug *</label>
+    <div class="col-md-6 mb-4">
+        <label for="slug">Slug *</label>
         <input type="text" name="slug" id="slug" 
                value="{{ old('slug', $category->translations->first()->slug ?? '') }}"
                required
-               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+               class="form-control">
+        <small class="form-text text-muted">The URL-friendly version of the name. Auto-generated from the category name.</small>
     </div>
+</div>
 
-    <div>
-        <label for="category_description" class="block text-sm font-medium text-gray-700">Description</label>
+<div class="form-row">
+    <div class="col-md-12 mb-4">
+        <label for="category_description">Description</label>
         <textarea name="category_description" id="category_description" rows="3"
-                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('category_description', $category->translations->first()->category_description ?? '') }}</textarea>
+                  class="form-control">{{ old('category_description', $category->translations->first()->category_description ?? '') }}</textarea>
+        <small class="form-text text-muted">A short description of what this category contains.</small>
     </div>
+</div>
 
-    <div>
-        <label for="lang_id" class="block text-sm font-medium text-gray-700">Language *</label>
+<div class="form-row">
+    <div class="col-md-6 mb-4">
+        <label for="lang_id">Language *</label>
         <select name="lang_id" id="lang_id" required
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                class="form-control">
             @foreach(\App\Models\Insights\Language::all() as $language)
                 <option value="{{ $language->id }}" 
                         {{ old('lang_id', $category->translations->first()->lang_id ?? '') == $language->id ? 'selected' : '' }}>
@@ -34,10 +40,10 @@
         </select>
     </div>
 
-    <div>
-        <label for="parent_id" class="block text-sm font-medium text-gray-700">Parent Category</label>
+    <div class="col-md-6 mb-4">
+        <label for="parent_id">Parent Category</label>
         <select name="parent_id" id="parent_id"
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                class="form-control">
             <option value="">None (Top Level Category)</option>
             @foreach($categories ?? [] as $parentCategory)
                 @if(!isset($category) || $parentCategory->id !== $category->id)
@@ -48,10 +54,11 @@
                 @endif
             @endforeach
         </select>
+        <small class="form-text text-muted">Optional. Select a parent category if this is a subcategory.</small>
     </div>
 </div>
 
-@push('scripts')
+@push('page-scripts')
 <script>
 document.getElementById('category_name').addEventListener('blur', function() {
     if (!document.getElementById('slug').value) {
