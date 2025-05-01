@@ -80,7 +80,8 @@ class InsightsLogService
 
     public function logCategoryCreated(Category $category, User $user)
     {
-        $this->log('info', "Category created: {$category->translations->first()->category_name}", [
+        $categoryName = $category->translations->first() ? $category->translations->first()->category_name : 'Unnamed Category';
+        $this->log('info', "Category created: {$categoryName}", [
             'category_id' => $category->id,
             'user_id' => $user->id,
             'user_name' => $user->name,
@@ -89,7 +90,8 @@ class InsightsLogService
 
     public function logCategoryUpdated(Category $category, User $user)
     {
-        $this->log('info', "Category updated: {$category->translations->first()->category_name}", [
+        $categoryName = $category->translations->first() ? $category->translations->first()->category_name : 'Unnamed Category';
+        $this->log('info', "Category updated: {$categoryName}", [
             'category_id' => $category->id,
             'user_id' => $user->id,
             'user_name' => $user->name,
@@ -98,7 +100,8 @@ class InsightsLogService
 
     public function logCategoryDeleted(Category $category, User $user)
     {
-        $this->log('info', "Category deleted: {$category->translations->first()->category_name}", [
+        $categoryName = $category->translations->first() ? $category->translations->first()->category_name : 'Unnamed Category';
+        $this->log('info', "Category deleted: {$categoryName}", [
             'category_id' => $category->id,
             'user_id' => $user->id,
             'user_name' => $user->name,

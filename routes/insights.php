@@ -35,9 +35,9 @@ Route::middleware(['web', 'auth', 'insights.admin'])->group(function () {
             Route::get('/', [InsightsAdminController::class, 'categories'])->name('insights.admin.categories');
             Route::get('/create', [InsightsAdminController::class, 'createCategory'])->name('insights.admin.categories.create');
             Route::post('/', [InsightsAdminController::class, 'storeCategory'])->name('insights.admin.categories.store');
-            Route::get('/{category}/edit', [InsightsAdminController::class, 'editCategory'])->name('insights.admin.categories.edit');
-            Route::put('/{category}', [InsightsAdminController::class, 'updateCategory'])->name('insights.admin.categories.update');
-            Route::delete('/{category}', [InsightsAdminController::class, 'destroyCategory'])->name('insights.admin.categories.destroy');
+            Route::get('/edit/{id}', [InsightsAdminController::class, 'editCategory'])->name('insights.admin.categories.edit');
+            Route::put('/update/{id}', [InsightsAdminController::class, 'updateCategory'])->name('insights.admin.categories.update');
+            Route::delete('/delete/{id}', [InsightsAdminController::class, 'destroyCategory'])->name('insights.admin.categories.destroy');
         });
 
         // Comments management

@@ -9,6 +9,16 @@ class Category extends Model
     protected $table = 'insights_categories';
     protected $fillable = ['created_by', 'parent_id', 'lft', 'rgt', 'depth'];
 
+    /**
+     * Get the route key for the model.
+     *
+     * @return string
+     */
+    public function getRouteKeyName()
+    {
+        return 'id';
+    }
+
     public function translations()
     {
         return $this->hasMany(CategoryTranslation::class, 'category_id');

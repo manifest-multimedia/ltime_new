@@ -180,69 +180,188 @@ class InsightsAdminController extends Controller
 
     public function storeCategory(Request $request)
     {
-        $this->validate($request, [
-            'category_name' => 'required',
-            'slug' => 'required|unique:insights_category_translations,slug',
-            'lang_id' => 'required|exists:insights_languages,id',
-        ]);
+        try {
+            $this->validate($request, [
+                'category_name' => 'required',
+                'slug' => 'required|unique:insights_category_translations,slug',
+                'lang_id' => 'required|exists:insights_languages,id',
+            ]);
 
-        $category = Category::create([
-            'created_by' => Auth::id(),
-        ]);
+            // First create the category
+            $category = Category::create([
+                'created_by' => Auth::id(),
+                'parent_id' => $request->parent_id ?: null,
+            ]);
 
-        $category->translations()->create([
-            'category_name' => $request->category_name,
-            'slug' => Str::slug($request->slug),
-            'category_description' => $request->category_description,
-            'lang_id' => $request->lang_id,
-        ]);
+            // Then explicitly create the translation with all required fields
+            $translation = CategoryTranslation::create([
+                'category_id' => $category->id,
+                'category_name' => $request->category_name,
+                'slug' => Str::slug($request->slug),
+                'category_description' => $request->category_description,
+                'lang_id' => $request->lang_id,
+            ]);
 
-        return redirect()->route('insights.admin.categories')
-            ->with('success', 'Category created successfully');
+            // Ensure the category has the translation loaded
+            $category->setRelation('translations', collect([$translation]));
+
+            // Log the category creation safely
+            $logService = app(\App\Services\InsightsLogService::class);
+            try {
+                $logService->logCategoryCreated($category, Auth::user());
+            } catch (\Exception $logException) {
+                \Log::error("Error logging category creation: " . $logException->getMessage());
+                // Continue execution even if logging fails
+            }
+
+            return redirect()->route('insights.admin.categories')
+                ->with('success', 'Category created successfully');
+        } catch (\Exception $e) {
+            \Log::error("Error creating category: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return redirect()->back()
+                ->with('error', 'Error creating category: ' . $e->getMessage())
+                ->withInput();
+        }
     }
 
     public function editCategory($id)
     {
-        $category = Category::with('translations')->findOrFail($id);
-        $categories = Category::with('translations')->where('id', '!=', $id)->get(); // Get all categories except this one
-        return view('insights.admin.categories.edit', compact('category', 'categories'));
+        try {
+            // Explicitly find the category by ID using a simple query
+            $category = Category::find($id);
+            
+            // If no category found, throw an exception
+            if (!$category) {
+                throw new \Exception("Category not found with ID: {$id}");
+            }
+            
+            // Eager load translations to avoid N+1 queries
+            $category->load('translations');
+            
+            $categories = Category::with('translations')
+                ->where('id', '!=', $id)
+                ->get();
+            
+            // If the category has no translations, create a dummy translation object for the form
+            if ($category->translations->isEmpty()) {
+                $defaultLang = \App\Models\Insights\Language::getDefault();
+                $tempTranslation = new CategoryTranslation();
+                $tempTranslation->category_id = $category->id;
+                $tempTranslation->lang_id = $defaultLang ? $defaultLang->id : 1; // Default to 1 if no default found
+                $category->setRelation('translations', collect([$tempTranslation]));
+            }
+            
+            return view('insights.admin.categories.edit', compact('category', 'categories'));
+        } catch (\Exception $e) {
+            \Log::error("Error editing category: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return redirect()->route('insights.admin.categories')
+                ->with('error', 'Error editing category: ' . $e->getMessage());
+        }
     }
 
     public function updateCategory(Request $request, $id)
     {
-        $category = Category::findOrFail($id);
-        
-        $this->validate($request, [
-            'category_name' => 'required',
-            'slug' => 'required|unique:insights_category_translations,slug,' . $category->translations->first()->id,
-            'lang_id' => 'required|exists:insights_languages,id',
-        ]);
-        
-        $category->translations()->updateOrCreate(
-            ['lang_id' => $request->lang_id],
-            [
-                'category_name' => $request->category_name,
-                'slug' => Str::slug($request->slug),
-                'category_description' => $request->category_description,
-            ]
-        );
+        try {
+            \Log::info("Attempting to update category with ID: " . $id, $request->except('_token', '_method'));
+            
+            // Explicitly find the category by ID
+            $category = Category::find($id);
+            
+            // If no category found, throw an exception
+            if (!$category) {
+                throw new \Exception("Category not found with ID: {$id}");
+            }
+            
+            \Log::info("Category found for update: ", ['id' => $category->id]);
+            
+            $this->validate($request, [
+                'category_name' => 'required',
+                'slug' => 'required',
+                'lang_id' => 'required|exists:insights_languages,id',
+            ]);
+            
+            // Check for slug uniqueness with a custom query to avoid errors when there are no translations
+            $existingTranslation = CategoryTranslation::where('slug', Str::slug($request->slug))
+                ->where('category_id', '!=', $category->id)
+                ->first();
+                
+            if ($existingTranslation) {
+                \Log::info("Slug already exists: " . $request->slug);
+                return back()->withErrors(['slug' => 'The slug has already been taken.'])->withInput();
+            }
+            
+            // Update or create the translation
+            $translation = CategoryTranslation::updateOrCreate(
+                [
+                    'category_id' => $category->id,
+                    'lang_id' => $request->lang_id
+                ],
+                [
+                    'category_name' => $request->category_name,
+                    'slug' => Str::slug($request->slug),
+                    'category_description' => $request->category_description,
+                ]
+            );
+            
+            \Log::info("Category translation updated/created", [
+                'translation_id' => $translation->id,
+                'category_name' => $translation->category_name
+            ]);
 
-        // Update parent category if provided
-        if ($request->has('parent_id')) {
-            $category->update(['parent_id' => $request->parent_id]);
+            // Update parent category if provided
+            $category->update([
+                'parent_id' => $request->parent_id ?: null
+            ]);
+
+            return redirect()->route('insights.admin.categories')
+                ->with('success', 'Category updated successfully');
+                
+        } catch (\Exception $e) {
+            \Log::error("Error updating category: " . $e->getMessage(), [
+                'category_id' => $id,
+                'trace' => $e->getTraceAsString()
+            ]);
+            return redirect()->route('insights.admin.categories')
+                ->with('error', 'Error updating category: ' . $e->getMessage());
         }
-
-        return redirect()->route('insights.admin.categories')
-            ->with('success', 'Category updated successfully');
     }
 
     public function destroyCategory($id)
     {
-        $category = Category::findOrFail($id);
-        $category->delete();
+        try {
+            \Log::info("Attempting to delete category with ID: " . $id);
+            
+            // Explicitly find the category by ID
+            $category = Category::find($id);
+            
+            // If no category found, throw an exception
+            if (!$category) {
+                throw new \Exception("Category not found with ID: {$id}");
+            }
+            
+            \Log::info("Category found for deletion: ", ['id' => $category->id]);
+            
+            // Check if category has posts
+            $postsCount = $category->posts->count();
+            if ($postsCount > 0) {
+                \Log::info("Category has {$postsCount} posts, but proceeding with deletion");
+            }
+            
+            // Delete the category and its translations (should cascade)
+            $category->delete();
+            \Log::info("Category deleted successfully", ['id' => $id]);
 
-        return redirect()->route('insights.admin.categories')
-            ->with('success', 'Category deleted successfully');
+            return redirect()->route('insights.admin.categories')
+                ->with('success', 'Category deleted successfully');
+                
+        } catch (\Exception $e) {
+            \Log::error("Error deleting category: " . $e->getMessage(), [
+                'category_id' => $id,
+                'trace' => $e->getTraceAsString()
+            ]);
+            return redirect()->route('insights.admin.categories')
+                ->with('error', 'Error deleting category: ' . $e->getMessage());
+        }
     }
 
     // Comment management methods

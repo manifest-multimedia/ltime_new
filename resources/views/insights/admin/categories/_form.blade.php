@@ -2,7 +2,7 @@
     <div class="col-md-6 mb-4">
         <label for="category_name">Category Name *</label>
         <input type="text" name="category_name" id="category_name" 
-               value="{{ old('category_name', $category->translations->first()->category_name ?? '') }}"
+               value="{{ old('category_name', isset($category) && $category->translations->isNotEmpty() ? $category->translations->first()->category_name : '') }}"
                required
                class="form-control">
     </div>
@@ -10,7 +10,7 @@
     <div class="col-md-6 mb-4">
         <label for="slug">Slug *</label>
         <input type="text" name="slug" id="slug" 
-               value="{{ old('slug', $category->translations->first()->slug ?? '') }}"
+               value="{{ old('slug', isset($category) && $category->translations->isNotEmpty() ? $category->translations->first()->slug : '') }}"
                required
                class="form-control">
         <small class="form-text text-muted">The URL-friendly version of the name. Auto-generated from the category name.</small>
@@ -21,7 +21,7 @@
     <div class="col-md-12 mb-4">
         <label for="category_description">Description</label>
         <textarea name="category_description" id="category_description" rows="3"
-                  class="form-control">{{ old('category_description', $category->translations->first()->category_description ?? '') }}</textarea>
+                  class="form-control">{{ old('category_description', isset($category) && $category->translations->isNotEmpty() ? $category->translations->first()->category_description : '') }}</textarea>
         <small class="form-text text-muted">A short description of what this category contains.</small>
     </div>
 </div>
@@ -33,7 +33,7 @@
                 class="form-control">
             @foreach(\App\Models\Insights\Language::all() as $language)
                 <option value="{{ $language->id }}" 
-                        {{ old('lang_id', $category->translations->first()->lang_id ?? '') == $language->id ? 'selected' : '' }}>
+                        {{ old('lang_id', isset($category) && $category->translations->isNotEmpty() ? $category->translations->first()->lang_id : \App\Models\Insights\Language::getDefault()->id) == $language->id ? 'selected' : '' }}>
                     {{ $language->name }}
                 </option>
             @endforeach
@@ -49,7 +49,7 @@
                 @if(!isset($category) || $parentCategory->id !== $category->id)
                     <option value="{{ $parentCategory->id }}"
                             {{ old('parent_id', $category->parent_id ?? '') == $parentCategory->id ? 'selected' : '' }}>
-                        {{ $parentCategory->translations->first()->category_name }}
+                        {{ isset($parentCategory->translations) && $parentCategory->translations->isNotEmpty() ? $parentCategory->translations->first()->category_name : 'Unnamed Category' }}
                     </option>
                 @endif
             @endforeach
