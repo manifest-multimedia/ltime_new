@@ -173,7 +173,9 @@ class InsightsAdminController extends Controller
 
     public function createCategory()
     {
-        return view('insights.admin.categories.create');
+        $categories = Category::with('translations')->get();
+        $category = new Category(); // Create empty category instance to avoid variable undefined error
+        return view('insights.admin.categories.create', compact('categories', 'category'));
     }
 
     public function storeCategory(Request $request)
@@ -197,6 +199,50 @@ class InsightsAdminController extends Controller
 
         return redirect()->route('insights.admin.categories')
             ->with('success', 'Category created successfully');
+    }
+
+    public function editCategory($id)
+    {
+        $category = Category::with('translations')->findOrFail($id);
+        $categories = Category::with('translations')->where('id', '!=', $id)->get(); // Get all categories except this one
+        return view('insights.admin.categories.edit', compact('category', 'categories'));
+    }
+
+    public function updateCategory(Request $request, $id)
+    {
+        $category = Category::findOrFail($id);
+        
+        $this->validate($request, [
+            'category_name' => 'required',
+            'slug' => 'required|unique:insights_category_translations,slug,' . $category->translations->first()->id,
+            'lang_id' => 'required|exists:insights_languages,id',
+        ]);
+        
+        $category->translations()->updateOrCreate(
+            ['lang_id' => $request->lang_id],
+            [
+                'category_name' => $request->category_name,
+                'slug' => Str::slug($request->slug),
+                'category_description' => $request->category_description,
+            ]
+        );
+
+        // Update parent category if provided
+        if ($request->has('parent_id')) {
+            $category->update(['parent_id' => $request->parent_id]);
+        }
+
+        return redirect()->route('insights.admin.categories')
+            ->with('success', 'Category updated successfully');
+    }
+
+    public function destroyCategory($id)
+    {
+        $category = Category::findOrFail($id);
+        $category->delete();
+
+        return redirect()->route('insights.admin.categories')
+            ->with('success', 'Category deleted successfully');
     }
 
     // Comment management methods

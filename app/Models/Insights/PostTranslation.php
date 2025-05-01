@@ -31,6 +31,6 @@ class PostTranslation extends Model
 
     public function language()
     {
-        return $this->belongsTo(\BinshopsBlog\Models\BinshopsLanguage::class, 'lang_id');
+        return $this->belongsTo(Language::class, 'lang_id');
     }
 }

@@ -3,67 +3,77 @@
 @section('title', 'Manage Categories')
 
 @section('content')
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-                <div class="p-6">
-                    <div class="flex justify-between items-center mb-6">
-                        <h1 class="text-2xl font-semibold">Manage Categories</h1>
+    <div class="row layout-top-spacing">
+        <div class="col-12">
+            <div class="widget widget-table-two">
+                <div class="widget-content">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4>All Categories</h4>
                         <a href="{{ route('insights.admin.categories.create') }}"
-                           class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:outline-none focus:border-blue-700 focus:ring focus:ring-blue-200 active:bg-blue-600 disabled:opacity-25 transition">
+                           class="btn btn-primary">
                             Add New Category
                         </a>
                     </div>
 
                     @if($categories->count())
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead>
                                     <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Slug</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Posts</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
-                                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                        <th>Category Name</th>
+                                        <th>Slug</th>
+                                        <th>Posts</th>
+                                        <th class="text-center">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
+                                <tbody>
                                     @foreach($categories as $category)
                                         <tr>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="text-sm font-medium text-gray-900">
+                                            <td>
+                                                <div class="font-weight-bold">
                                                     {{ $category->translations->first()->category_name }}
                                                 </div>
                                                 @if($category->translations->first()->category_description)
-                                                    <div class="text-sm text-gray-500">
-                                                        {{ Str::limit($category->translations->first()->category_description, 50) }}
-                                                    </div>
+                                                <div class="text-muted small">
+                                                    {{ Str::limit($category->translations->first()->category_description, 50) }}
+                                                </div>
                                                 @endif
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <td>
                                                 {{ $category->translations->first()->slug }}
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {{ $category->posts->count() }}
+                                            <td>
+                                                <span class="badge badge-light">{{ $category->posts->count() }}</span>
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {{ $category->created_at->format('M j, Y') }}
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <div class="flex justify-end space-x-3">
+                                            <td class="text-center">
+                                                <div class="d-flex justify-content-center">
                                                     <a href="{{ route('insights.category', $category->translations->first()->slug) }}" 
                                                        target="_blank"
-                                                       class="text-blue-600 hover:text-blue-900">View</a>
+                                                       class="btn btn-sm btn-info mr-2">
+                                                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye">
+                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                            <circle cx="12" cy="12" r="3"></circle>
+                                                        </svg>
+                                                    </a>
                                                     <a href="{{ route('insights.admin.categories.edit', $category->id) }}" 
-                                                       class="text-indigo-600 hover:text-indigo-900">Edit</a>
+                                                       class="btn btn-sm btn-primary mr-2">
+                                                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-2">
+                                                            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+                                                        </svg>
+                                                    </a>
                                                     <form action="{{ route('insights.admin.categories.destroy', $category->id) }}" 
                                                           method="POST" 
                                                           onsubmit="return confirm('Are you sure you want to delete this category?');"
-                                                          class="inline">
+                                                          class="d-inline">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="text-red-600 hover:text-red-900">
-                                                            Delete
+                                                        <button type="submit" class="btn btn-sm btn-danger">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2">
+                                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                                <line x1="10" y1="11" x2="10" y2="17"></line>
+                                                                <line x1="14" y1="11" x2="14" y2="17"></line>
+                                                            </svg>
                                                         </button>
                                                     </form>
                                                 </div>
@@ -78,7 +88,9 @@
                             {{ $categories->links() }}
                         </div>
                     @else
-                        <p class="text-gray-500">No categories found. Create your first category!</p>
+                        <div class="alert alert-info">
+                            No categories found. Create your first category!
+                        </div>
                     @endif
                 </div>
             </div>

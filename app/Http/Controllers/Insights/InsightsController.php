@@ -66,4 +66,81 @@ class InsightsController extends Controller
 
         return view('insights.search', compact('posts', 'query'));
     }
+    
+    public function storeComment(Request $request, $slug)
+    {
+        // Find the post by slug
+        $post = Post::whereHas('translations', function($query) use ($slug) {
+            $query->where('slug', $slug);
+        })->firstOrFail();
+        
+        // Validate the request
+        $validationRules = ['comment' => 'required|min:3'];
+        
+        // Add captcha validation if enabled
+        if (config('insights.captcha.captcha_enabled')) {
+            $validationRules['captcha'] = 'required';
+        }
+        
+        // Add author validation for guests
+        if (!auth()->check()) {
+            $validationRules['author_name'] = 'required';
+            
+            if (config('insights.comments.ask_for_author_email')) {
+                $validationRules['author_email'] = config('insights.comments.require_author_email') 
+                    ? 'required|email' 
+                    : 'nullable|email';
+            }
+            
+            if (config('insights.comments.ask_for_author_website')) {
+                $validationRules['author_website'] = 'nullable|url';
+            }
+        }
+        
+        $this->validate($request, $validationRules);
+        
+        // Verify captcha if enabled
+        if (config('insights.captcha.captcha_enabled')) {
+            $captchaClass = config('insights.captcha.captcha_type');
+            $captcha = new $captchaClass();
+            
+            if (!$captcha->verify($request->captcha)) {
+                return back()
+                    ->withErrors(['captcha' => 'Incorrect captcha answer'])
+                    ->withInput();
+            }
+        }
+        
+        // Create the comment
+        $comment = new Comment();
+        $comment->post_id = $post->id;
+        $comment->comment = $request->comment;
+        
+        // Auto-approve based on settings
+        $comment->approved = config('insights.comments.auto_approve_comments');
+        
+        // Set author information
+        if (auth()->check()) {
+            $user = auth()->user();
+            $comment->user_id = $user->id;
+            $comment->author_name = $user->name;
+            $comment->author_email = $user->email;
+        } else {
+            $comment->author_name = $request->author_name;
+            $comment->author_email = $request->author_email ?? null;
+            $comment->author_website = $request->author_website ?? null;
+        }
+        
+        // Save IP address if configured
+        if (config('insights.comments.save_ip_address')) {
+            $comment->ip = $request->ip();
+        }
+        
+        $comment->save();
+        
+        return redirect()->back()
+            ->with('success', $comment->approved 
+                ? 'Your comment has been added!' 
+                : 'Your comment has been submitted and awaiting approval.');
+    }
 }

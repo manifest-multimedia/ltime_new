@@ -1,75 +1,70 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Admin') - Insights</title>
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+<x-backend-layout>
+    <!-- Admin Navigation -->
+    <div id="content" class="main-content">
+        <div class="layout-px-spacing">
+            <div class="page-header">
+                <div class="page-title">
+                    <h3>@yield('title', 'Insights Management')</h3>
+                </div>
+            </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
-    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/insights-admin.js'])
-
-    @stack('styles')
-</head>
-<body class="font-sans antialiased">
-    <div class="min-h-screen bg-gray-100">
-        @include('layouts.navigation')
-
-        <!-- Admin Navigation -->
-        <nav class="bg-white border-b">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16">
-                    <div class="flex">
-                        <div class="flex space-x-8">
-                            <a href="{{ route('insights.admin.index') }}" 
-                               class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('insights.admin.index') ? 'border-indigo-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700' }}">
-                                Posts
-                            </a>
-                            <a href="{{ route('insights.admin.categories') }}"
-                               class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('insights.admin.categories*') ? 'border-indigo-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700' }}">
-                                Categories
-                            </a>
-                            <a href="{{ route('insights.admin.comments') }}"
-                               class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('insights.admin.comments*') ? 'border-indigo-500 text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700' }}">
-                                Comments
-                            </a>
+            <!-- Insights Admin Navigation -->
+            <div class="row layout-top-spacing">
+                <div class="col-12">
+                    <div class="bg-white shadow-sm mb-4">
+                        <div class="p-3">
+                            <div class="d-flex">
+                                <a href="{{ route('insights.admin.index') }}" 
+                                class="mr-4 {{ request()->routeIs('insights.admin.index') || request()->routeIs('insights.admin.create') || request()->routeIs('insights.admin.edit') ? 'font-weight-bold text-primary' : 'text-dark' }}">
+                                    Posts
+                                </a>
+                                <a href="{{ route('insights.admin.categories') }}"
+                                class="mr-4 {{ request()->routeIs('insights.admin.categories*') ? 'font-weight-bold text-primary' : 'text-dark' }}">
+                                    Categories
+                                </a>
+                                <a href="{{ route('insights.admin.comments') }}"
+                                class="mr-4 {{ request()->routeIs('insights.admin.comments*') ? 'font-weight-bold text-primary' : 'text-dark' }}">
+                                    Comments
+                                </a>
+                                <a href="{{ route('insights.index') }}" target="_blank"
+                                class="ml-auto text-info">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link">
+                                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                        <polyline points="15 3 21 3 21 9"></polyline>
+                                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                                    </svg>
+                                    View Site
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </nav>
 
-        <!-- Page Content -->
-        <main>
+            <!-- Alerts -->
             @if(session()->has('success'))
-                <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
-                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-                        {{ session('success') }}
-                    </div>
+                <div class="alert alert-success mb-4">
+                    {{ session('success') }}
                 </div>
             @endif
 
             @if($errors->any())
-                <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
-                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
+                <div class="alert alert-danger mb-4">
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
                 </div>
             @endif
 
+            <!-- Page Content -->
             @yield('content')
-        </main>
+        </div>
     </div>
 
-    @stack('scripts')
-</body>
-</html>
+    @push('scripts')
+        <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+        @stack('page-scripts')
+    @endpush
+</x-backend-layout>

@@ -3,100 +3,88 @@
 @section('title', 'Manage Comments')
 
 @section('content')
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-                <div class="p-6">
-                    <div class="mb-6">
-                        <h1 class="text-2xl font-semibold">Manage Comments</h1>
+    <div class="row layout-top-spacing">
+        <div class="col-12">
+            <div class="widget widget-table-two">
+                <div class="widget-content">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4>All Comments</h4>
                     </div>
 
                     @if($comments->count())
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead>
                                     <tr>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comment</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Post</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
-                                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                        <th>Comment</th>
+                                        <th>Author</th>
+                                        <th>Post</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                        <th class="text-center">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
+                                <tbody>
                                     @foreach($comments as $comment)
                                         <tr>
-                                            <td class="px-6 py-4">
-                                                <div class="text-sm text-gray-900">
+                                            <td style="max-width: 300px;">
+                                                <div class="text-wrap">
                                                     {{ Str::limit($comment->comment, 100) }}
                                                 </div>
                                             </td>
-                                            <td class="px-6 py-4">
-                                                <div class="text-sm">
-                                                    <a href="{{ route('insights.show', $comment->post->translations->first()->slug) }}"
-                                                       class="text-blue-600 hover:text-blue-900"
-                                                       target="_blank">
-                                                        {{ Str::limit($comment->post->translations->first()->title, 50) }}
-                                                    </a>
+                                            <td>
+                                                <div class="font-weight-bold">
+                                                    {{ $comment->author_name }}
                                                 </div>
-                                            </td>
-                                            <td class="px-6 py-4">
-                                                <div class="text-sm">
-                                                    @if($comment->user)
-                                                        <span class="font-medium">{{ $comment->user->name }}</span>
-                                                    @else
-                                                        <span>{{ $comment->author_name }}</span>
-                                                        @if($comment->author_email)
-                                                            <div class="text-gray-500 text-xs">{{ $comment->author_email }}</div>
-                                                        @endif
-                                                    @endif
-                                                    @if($comment->author_website)
-                                                        <div class="text-xs">
-                                                            <a href="{{ $comment->author_website }}" 
-                                                               class="text-blue-600 hover:text-blue-900"
-                                                               target="_blank">
-                                                                Website
-                                                            </a>
-                                                        </div>
-                                                    @endif
+                                                @if($comment->author_email)
+                                                <div class="text-muted small">
+                                                    {{ $comment->author_email }}
                                                 </div>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap">
-                                                @if($comment->approved)
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                        Approved
-                                                    </span>
-                                                @else
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                                        Pending
-                                                    </span>
                                                 @endif
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {{ $comment->created_at->format('M j, Y g:i A') }}
+                                            <td>
+                                                <a href="{{ route('insights.show', $comment->post->translations->first()->slug) }}#comments" target="_blank">
+                                                    {{ Str::limit($comment->post->translations->first()->title, 30) }}
+                                                </a>
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                                <div class="flex justify-end space-x-3">
+                                            <td>
+                                                @if($comment->approved)
+                                                    <span class="badge badge-success">Approved</span>
+                                                @else
+                                                    <span class="badge badge-warning">Pending</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                {{ $comment->created_at->format('M j, Y') }}
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="d-flex justify-content-center">
                                                     @if(!$comment->approved)
                                                         <form action="{{ route('insights.admin.comments.approve', $comment->id) }}" 
-                                                              method="POST" 
-                                                              class="inline">
+                                                            method="POST" 
+                                                            class="d-inline mr-2">
                                                             @csrf
                                                             @method('PATCH')
-                                                            <button type="submit" class="text-green-600 hover:text-green-900">
-                                                                Approve
+                                                            <button type="submit" class="btn btn-sm btn-success" title="Approve">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check">
+                                                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                                                </svg>
                                                             </button>
                                                         </form>
                                                     @endif
                                                     <form action="{{ route('insights.admin.comments.destroy', $comment->id) }}" 
-                                                          method="POST" 
-                                                          onsubmit="return confirm('Are you sure you want to delete this comment?');"
-                                                          class="inline">
+                                                            method="POST" 
+                                                            onsubmit="return confirm('Are you sure you want to delete this comment?');"
+                                                            class="d-inline">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="text-red-600 hover:text-red-900">
-                                                            Delete
+                                                        <button type="submit" class="btn btn-sm btn-danger" title="Delete">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2">
+                                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1-2-2h4a2 2 0 0 1-2 2v2"></path>
+                                                                <line x1="10" y1="11" x2="10" y2="17"></line>
+                                                                <line x1="14" y1="11" x2="14" y2="17"></line>
+                                                            </svg>
                                                         </button>
                                                     </form>
                                                 </div>
@@ -111,7 +99,9 @@
                             {{ $comments->links() }}
                         </div>
                     @else
-                        <p class="text-gray-500">No comments found.</p>
+                        <div class="alert alert-info">
+                            No comments found.
+                        </div>
                     @endif
                 </div>
             </div>

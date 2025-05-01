@@ -25,7 +25,7 @@
         <label for="lang_id" class="block text-sm font-medium text-gray-700">Language *</label>
         <select name="lang_id" id="lang_id" required
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            @foreach(\BinshopsBlog\Models\BinshopsLanguage::all() as $language)
+            @foreach(\App\Models\Insights\Language::all() as $language)
                 <option value="{{ $language->id }}" 
                         {{ old('lang_id', $category->translations->first()->lang_id ?? '') == $language->id ? 'selected' : '' }}>
                     {{ $language->name }}
