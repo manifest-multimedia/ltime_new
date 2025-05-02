@@ -32,7 +32,7 @@
     </style>
 
     <!-- Livewire Assets - replaced @livewireStyles directive -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/js/app.js'])
 
     <!-- END PAGE LEVEL PLUGINS/CUSTOM STYLES -->
 

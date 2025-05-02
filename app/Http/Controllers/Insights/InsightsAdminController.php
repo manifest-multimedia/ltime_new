@@ -8,6 +8,7 @@ use App\Models\Insights\Category;
 use App\Models\Insights\PostTranslation;
 use App\Models\Insights\CategoryTranslation;
 use App\Models\Insights\Comment;
+use App\Models\Insights\Language;
 use App\Models\Insights\UploadedPhoto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -99,8 +100,31 @@ class InsightsAdminController extends Controller
     public function edit($id)
     {
         try {
-            // Explicitly find the post by ID
-            $post = Post::find($id);
+            // Handle cases where the entire post object is passed instead of just the ID
+            if (is_string($id) && strpos($id, '{') === 0) {
+                // This looks like a JSON string of a post object
+                $postData = json_decode($id, true);
+                if (json_last_error() === JSON_ERROR_NONE && isset($postData['id'])) {
+                    $id = $postData['id'];
+                    \Log::info("Extracted post ID {$id} from post object", ['original_input' => $id]);
+                }
+            } else if (is_object($id) && method_exists($id, 'toArray')) {
+                // This is likely an Eloquent model instance
+                $postData = $id->toArray();
+                if (isset($postData['id'])) {
+                    $id = $postData['id'];
+                    \Log::info("Extracted post ID {$id} from model instance");
+                }
+            }
+            
+            // Make sure we have a numeric ID at this point
+            if (!is_numeric($id)) {
+                \Log::error("Non-numeric post ID provided for editing after extraction attempt: " . print_r($id, true));
+                throw new \Exception("Invalid post ID format: " . print_r($id, true));
+            }
+            
+            // Now proceed with the normal flow using the numeric ID
+            $post = Post::find((int)$id);
             
             // If no post found, throw an exception
             if (!$post) {
@@ -108,38 +132,62 @@ class InsightsAdminController extends Controller
                 throw new \Exception("Post not found with ID: {$id}");
             }
             
-            // Eager load translations and categories to avoid N+1 queries
-            $post->load(['translations', 'categories']);
+            // Debug to verify what we're getting
+            \Log::info("Post retrieved for editing", [
+                'post_id' => $post->id,
+                'post_type' => get_class($post),
+            ]);
             
+            // Eager load categories relation
+            $post->load('categories');
+            
+            // Fetch all categories for the dropdown
             $categories = Category::with('translations')->get();
             
-            // Make sure translations is initialized as a collection, even if it's empty
-            if (!$post->relationLoaded('translations') || !($post->translations instanceof \Illuminate\Support\Collection)) {
-                $post->setRelation('translations', collect([]));
+            // Get the default language for new translations
+            $defaultLang = Language::getDefault();
+            if (!$defaultLang) {
+                \Log::warning("No default language set, using first available language");
+                $defaultLang = Language::first();
+                
+                if (!$defaultLang) {
+                    throw new \Exception("No languages found in the system. Please create at least one language.");
+                }
             }
             
-            // If the post has no translations, create a properly initialized dummy translation object for the form
-            if ($post->translations->isEmpty()) {
-                $defaultLang = \App\Models\Insights\Language::getDefault();
-                $tempTranslation = new PostTranslation();
+            // Get translations for this post
+            $translations = PostTranslation::where('post_id', $post->id)->get();
+            
+            // Set the translations relation manually
+            $post->setRelation('translations', $translations);
+            
+            // Create default translation if needed
+            if ($translations->isEmpty()) {
+                \Log::info("No translations found for post {$id}, creating default English translation");
                 
-                // Initialize all required fields with empty values to prevent null errors
+                $tempTranslation = new PostTranslation();
                 $tempTranslation->post_id = $post->id;
-                $tempTranslation->title = '';
-                $tempTranslation->slug = '';
+                $tempTranslation->title = 'Untitled';
+                $tempTranslation->slug = 'post-' . $post->id;
                 $tempTranslation->post_body = '';
                 $tempTranslation->short_description = '';
                 $tempTranslation->subtitle = '';
                 $tempTranslation->meta_desc = '';
                 $tempTranslation->seo_title = '';
-                $tempTranslation->lang_id = $defaultLang ? $defaultLang->id : 1; // Default to 1 if no default found
+                $tempTranslation->lang_id = $defaultLang->id;
                 
+                // We're not saving this temporary translation to the database yet
+                // It's just for form display purposes
                 $post->setRelation('translations', collect([$tempTranslation]));
             }
             
             return view('insights.admin.edit', compact('post', 'categories'));
         } catch (\Exception $e) {
-            \Log::error("Error editing post: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            \Log::error("Error editing post: " . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'post_id' => $id
+            ]);
+            
             return redirect()->route('insights.admin.index')
                 ->with('error', 'Error editing post: ' . $e->getMessage());
         }

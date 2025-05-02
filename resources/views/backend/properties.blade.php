@@ -51,7 +51,7 @@
             </div>
 
          
-           @livewire('new-property-modal')
+           <livewire:new-property-modal />
            
        
 

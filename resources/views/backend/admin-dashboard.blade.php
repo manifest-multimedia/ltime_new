@@ -21,8 +21,7 @@
 
                         <div class="col-xl-6 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
                             <div class="widget widget-table-two">
-
-                            @livewire('recent-orders-table')
+                               <livewire:recent-orders-table />
 
                             </div>
                         </div>
@@ -31,7 +30,7 @@
                         <div class="col-xl-6 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
                             <div class="widget widget-table-three">
 
-                            @livewire('top-affiliates-table')
+                            <livewire:top-affiliates-table />
 
                             </div>
                         </div>

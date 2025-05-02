@@ -33,22 +33,6 @@ class Post extends Model
     {
         return $this->belongsTo(\App\Models\User::class);
     }
-
-    /**
-     * Get the translations relationship with a safety check to return an empty collection if null
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function getTranslationsAttribute()
-    {
-        // If translations relation is loaded but null, return empty collection instead
-        if (array_key_exists('translations', $this->relations) && $this->relations['translations'] === null) {
-            return collect();
-        }
-        
-        // Otherwise return the normal relation value
-        return $this->getRelationValue('translations');
-    }
     
     /**
      * Get the first translation or null if no translations exist

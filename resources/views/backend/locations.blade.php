@@ -7,6 +7,6 @@
                     <h3>Locations</h3>
                 </div>
             </div>
-   @livewire('property-locations-widget')
+<livewire:property-locations-widget />
 
 </x-backend-layout>

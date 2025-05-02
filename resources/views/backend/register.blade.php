@@ -2,7 +2,7 @@
 
     <x-validation-errors class="mb-4" />
 
-       @livewire('signup-form')
+    <livewire:signup-form />
 
      
 

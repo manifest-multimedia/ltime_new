@@ -113,14 +113,14 @@
                             <div class="title-box">
                                 <h4>Schedule A Tour</h4>
                             </div>
-                            @livewire('book-tour-form-widget')
+                            <livewire:book-tour-form-widget />
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-4 col-md-12 col-sm-12 sidebar-side">
                     <div class="property-sidebar default-sidebar">
                         <div class="author-widget sidebar-widget">
-                            @livewire('inquiry-form-widget')
+                            <livewire:inquiry-form-widget />
                         </div>
                     </div>
                 </div>

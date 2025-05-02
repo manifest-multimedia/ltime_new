@@ -22,7 +22,7 @@
                         <div class="card">
                             <div class="card-header">System Configuration</div>
                             <div class="card-body">
-                                @livewire('system-settings-widget')
+                                <livewire:system-settings-widget />
                             </div>
                         </div>
                     </div>
@@ -44,6 +44,6 @@
                     </div>
                 </div>
             </div>
- 
-
+        </div>
+    </div>
 </x-backend-layout>

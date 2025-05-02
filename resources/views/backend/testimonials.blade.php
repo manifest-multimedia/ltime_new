@@ -19,12 +19,10 @@
     
       
         {{-- Load Testimonials Widget --}}
-            @livewire('testimonials-list-widget')
-                         
-                        
-   
-           @livewire('new-testimonial-modal')
+            <livewire:testimonials-list-widget />
 
-            @livewire('edit-modal')
+            <livewire:new-testimonial-modal />
+
+            <livewire:edit-modal />
     
     </x-backend-layout>

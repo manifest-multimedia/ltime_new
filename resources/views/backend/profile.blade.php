@@ -17,7 +17,7 @@
             </div>
     
             <div class="pt-2 pb-5">
-                @livewire('user-profile-component')
+                <livewire:user-profile-component />
             </div>
  
 

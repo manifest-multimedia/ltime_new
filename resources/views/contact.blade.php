@@ -50,7 +50,7 @@
                             <h5>Contact</h5>
                             <h2>Contact Us</h2>
                         </div>
-                        @livewire('contact-form-widget')
+                        <livewire:contact-form-widget />
                     </div>
                 </div>
                 <div class="col-lg-6 col-md-12 col-sm-12 map-column">

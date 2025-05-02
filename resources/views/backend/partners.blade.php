@@ -22,7 +22,7 @@
                 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
                     <div class="widget widget-table-two">
     
-                        @livewire('partner-list-widget')
+                        <livewire:partner-list-widget />
     
                     </div>
                 </div>
@@ -42,6 +42,6 @@
     
             </div>
     
-           @livewire('new-partner-modal')
+           <livewire:new-partner-modal />
     
     </x-backend-layout>

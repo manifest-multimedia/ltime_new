@@ -1,110 +1,146 @@
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <div class="md:col-span-2 space-y-6">
-        <div>
-            <label for="title" class="block text-sm font-medium text-gray-700">Title *</label>
-            <input type="text" name="title" id="title" 
-                   value="{{ old('title', isset($post->translations) && $post->translations->isNotEmpty() ? $post->translations->first()->title : '') }}"
-                   required
-                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-        </div>
-        
-        <div>
-            <label for="slug" class="block text-sm font-medium text-gray-700">Slug *</label>
-            <input type="text" name="slug" id="slug" 
-                   value="{{ old('slug', isset($post->translations) && $post->translations->isNotEmpty() ? $post->translations->first()->slug : '') }}"
-                   required
-                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Post Content</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-group mb-3">
+                    <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
+                    <input type="text" name="title" id="title" 
+                           value="{{ old('title', isset($post->translations) && $post->translations->isNotEmpty() ? $post->translations->first()->title : '') }}"
+                           required
+                           class="form-control">
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label for="slug" class="form-label">Slug <span class="text-danger">*</span></label>
+                    <input type="text" name="slug" id="slug" 
+                           value="{{ old('slug', isset($post->translations) && $post->translations->isNotEmpty() ? $post->translations->first()->slug : '') }}"
+                           required
+                           class="form-control">
+                    <small class="form-text text-muted">The URL-friendly version of the title</small>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="subtitle" class="form-label">Subtitle</label>
+                    <input type="text" name="subtitle" id="subtitle" 
+                           value="{{ old('subtitle', isset($post->translations) && $post->translations->isNotEmpty() ? $post->translations->first()->subtitle : '') }}"
+                           class="form-control">
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="short_description" class="form-label">Short Description</label>
+                    <textarea name="short_description" id="short_description" rows="3"
+                              class="form-control">{{ old('short_description', isset($post->translations) && $post->translations->isNotEmpty() ? $post->translations->first()->short_description : '') }}</textarea>
+                    <small class="form-text text-muted">Appears in listings and search results</small>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="post_body" class="form-label">Content <span class="text-danger">*</span></label>
+                    <textarea name="post_body" id="post_body" rows="15" required
+                              class="form-control">{{ old('post_body', isset($post->translations) && $post->translations->isNotEmpty() ? $post->translations->first()->post_body : '') }}</textarea>
+                </div>
+            </div>
         </div>
 
-        <div>
-            <label for="subtitle" class="block text-sm font-medium text-gray-700">Subtitle</label>
-            <input type="text" name="subtitle" id="subtitle" 
-                   value="{{ old('subtitle', isset($post->translations) && $post->translations->isNotEmpty() ? $post->translations->first()->subtitle : '') }}"
-                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-        </div>
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">SEO Options</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-group mb-3">
+                    <label for="meta_desc" class="form-label">Meta Description</label>
+                    <textarea name="meta_desc" id="meta_desc" rows="2"
+                              class="form-control">{{ old('meta_desc', isset($post->translations) && $post->translations->isNotEmpty() ? $post->translations->first()->meta_desc : '') }}</textarea>
+                    <small class="form-text text-muted">Appears in search engine results</small>
+                </div>
 
-        <div>
-            <label for="short_description" class="block text-sm font-medium text-gray-700">Short Description</label>
-            <textarea name="short_description" id="short_description" rows="3"
-                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('short_description', isset($post->translations) && $post->translations->isNotEmpty() ? $post->translations->first()->short_description : '') }}</textarea>
-        </div>
-
-        <div>
-            <label for="post_body" class="block text-sm font-medium text-gray-700">Content *</label>
-            <textarea name="post_body" id="post_body" rows="20" required
-                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('post_body', isset($post->translations) && $post->translations->isNotEmpty() ? $post->translations->first()->post_body : '') }}</textarea>
-        </div>
-
-        <div>
-            <label for="meta_desc" class="block text-sm font-medium text-gray-700">Meta Description</label>
-            <textarea name="meta_desc" id="meta_desc" rows="2"
-                      class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">{{ old('meta_desc', isset($post->translations) && $post->translations->isNotEmpty() ? $post->translations->first()->meta_desc : '') }}</textarea>
-        </div>
-
-        <div>
-            <label for="seo_title" class="block text-sm font-medium text-gray-700">SEO Title</label>
-            <input type="text" name="seo_title" id="seo_title" 
-                   value="{{ old('seo_title', isset($post->translations) && $post->translations->isNotEmpty() ? $post->translations->first()->seo_title : '') }}"
-                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <div class="form-group mb-3">
+                    <label for="seo_title" class="form-label">SEO Title</label>
+                    <input type="text" name="seo_title" id="seo_title" 
+                           value="{{ old('seo_title', isset($post->translations) && $post->translations->isNotEmpty() ? $post->translations->first()->seo_title : '') }}"
+                           class="form-control">
+                    <small class="form-text text-muted">Custom title tag for SEO purposes</small>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="space-y-6">
-        <div>
-            <label for="image" class="block text-sm font-medium text-gray-700">Featured Image</label>
-            @if(isset($post->translations) && $post->translations->isNotEmpty() && !empty($post->translations->first()->image_medium))
-                <div class="mt-2 mb-4">
-                    <img src="{{ asset('storage/' . config('insights.blog_upload_dir') . '/image_medium/' . $post->translations->first()->image_medium) }}"
-                         alt="Current featured image"
-                         class="w-full rounded-lg">
-                </div>
-            @endif
-            <input type="file" name="image" id="image" accept="image/*"
-                   class="mt-1 block w-full">
-        </div>
-
-        <div>
-            <label for="lang_id" class="block text-sm font-medium text-gray-700">Language *</label>
-            <select name="lang_id" id="lang_id" required
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                @foreach(\App\Models\Insights\Language::all() as $language)
-                    <option value="{{ $language->id }}" 
-                            {{ old('lang_id', isset($post->translations) && $post->translations->isNotEmpty() ? $post->translations->first()->lang_id : '') == $language->id ? 'selected' : '' }}>
-                        {{ $language->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-
-        <div>
-            <label for="categories" class="block text-sm font-medium text-gray-700">Categories</label>
-            <select name="categories[]" id="categories" multiple
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                @foreach($categories as $category)
-                    <option value="{{ $category->id }}"
-                            {{ (isset($post) && $post->categories->contains($category->id)) ? 'selected' : '' }}>
-                        {{ $category->translations && $category->translations->isNotEmpty() ? $category->translations->first()->category_name : 'Unnamed category' }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-
-        <div>
-            <label for="posted_at" class="block text-sm font-medium text-gray-700">Publish Date</label>
-            <input type="datetime-local" name="posted_at" id="posted_at" 
-                   value="{{ old('posted_at', isset($post) && $post->posted_at ? $post->posted_at->format('Y-m-d\TH:i') : '') }}"
-                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-        </div>
-
-        <div class="relative flex items-start">
-            <div class="flex h-5 items-center">
-                <input type="checkbox" name="is_published" id="is_published"
-                       {{ old('is_published', isset($post) && $post->is_published ? 'checked' : '') }}
-                       class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Publishing Options</h5>
             </div>
-            <div class="ml-3 text-sm">
-                <label for="is_published" class="font-medium text-gray-700">Published</label>
-                <p class="text-gray-500">Make this post visible to the public</p>
+            <div class="card-body">
+                <div class="form-group mb-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="is_published" id="is_published" 
+                               {{ old('is_published', isset($post) && $post->is_published ? 'checked' : '') }}>
+                        <label class="form-check-label" for="is_published">Published</label>
+                    </div>
+                    <small class="form-text text-muted">Make this post visible to the public</small>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="posted_at" class="form-label">Publish Date</label>
+                    <input type="datetime-local" name="posted_at" id="posted_at" 
+                           value="{{ old('posted_at', isset($post) && $post->posted_at ? $post->posted_at->format('Y-m-d\TH:i') : '') }}"
+                           class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Featured Image</h5>
+            </div>
+            <div class="card-body">
+                @if(isset($post->translations) && $post->translations->isNotEmpty() && !empty($post->translations->first()->image_medium))
+                    <div class="mb-3">
+                        <img src="{{ asset('storage/' . config('insights.blog_upload_dir') . '/image_medium/' . $post->translations->first()->image_medium) }}"
+                             alt="Current featured image"
+                             class="img-fluid rounded">
+                    </div>
+                @endif
+                <div class="form-group mb-3">
+                    <input type="file" name="image" id="image" accept="image/*"
+                           class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Categories & Language</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-group mb-3">
+                    <label for="lang_id" class="form-label">Language <span class="text-danger">*</span></label>
+                    <select name="lang_id" id="lang_id" required
+                            class="form-select">
+                        @foreach(\App\Models\Insights\Language::all() as $language)
+                            <option value="{{ $language->id }}" 
+                                    {{ old('lang_id', isset($post->translations) && $post->translations->isNotEmpty() ? $post->translations->first()->lang_id : '') == $language->id ? 'selected' : '' }}>
+                                {{ $language->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="categories" class="form-label">Categories</label>
+                    <select name="categories[]" id="categories" multiple
+                            class="form-select" size="5">
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}"
+                                    {{ (isset($post) && $post->categories->contains($category->id)) ? 'selected' : '' }}>
+                                {{ $category->translations && $category->translations->isNotEmpty() ? $category->translations->first()->category_name : 'Unnamed category' }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <small class="form-text text-muted">Hold Ctrl/Cmd to select multiple categories</small>
+                </div>
             </div>
         </div>
     </div>
@@ -129,7 +165,7 @@ document.getElementById('title').addEventListener('blur', function() {
         selector: '#post_body',
         plugins: 'advlist autolink lists link image charmap print preview hr anchor pagebreak',
         toolbar_mode: 'floating',
-        height: 500,
+        height: 400,
         branding: false
     });
 </script>
