@@ -143,4 +143,36 @@ class InsightsController extends Controller
                 ? 'Your comment has been added!' 
                 : 'Your comment has been submitted and awaiting approval.');
     }
+
+    /**
+     * Serve blog post images from storage
+     *
+     * @param string $filename
+     * @return \Illuminate\Http\Response
+     */
+    public function serveImage($filename)
+    {
+        // Determine the image type by checking its size suffix
+        $imageSizes = array_keys(config('insights.image_sizes', []));
+        $imageType = 'image_large'; // Default to large if no size detected
+        
+        // Loop through the image sizes to detect thumbnails, medium images, etc.
+        foreach ($imageSizes as $size) {
+            if (strpos($filename, '-' . $size) !== false) {
+                $imageType = $size;
+                break;
+            }
+        }
+        
+        // The actual path in storage where the image is stored
+        $path = storage_path('app/public/' . config('insights.blog_upload_dir') . '/' . $imageType . '/' . $filename);
+        
+        // Make sure the file exists
+        if (!file_exists($path)) {
+            abort(404);
+        }
+        
+        // Return the image with appropriate headers
+        return response()->file($path);
+    }
 }

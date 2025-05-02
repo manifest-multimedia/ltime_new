@@ -55,11 +55,23 @@
                             </div>
                         @endif
                     </div>
+                    
+                    @auth
+                        <div class="mt-4">
+                            <a href="{{ route('insights.admin.edit', $post->id) }}" 
+                               class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                                Edit Post
+                            </a>
+                        </div>
+                    @endauth
                 </header>
 
                 @if($translation && $translation->image_large)
                     <div class="w-full aspect-w-16 aspect-h-9 mb-8 overflow-hidden rounded-lg shadow-lg">
-                        <img src="{{ asset('storage/' . config('insights.blog_upload_dir') . '/image_large/' . $translation->image_large) }}"
+                        <img src="{{ url('/insights/images/' . $translation->image_large) }}"
                              alt="{{ $translation->title }}"
                              class="w-full h-full object-cover">
                     </div>
@@ -280,7 +292,7 @@
                                                 @if($relatedTranslation->image_thumbnail)
                                                     <a href="{{ route('insights.show', $relatedTranslation->slug) }}" class="flex-shrink-0 mr-3">
                                                         <div class="w-16 h-16 rounded overflow-hidden">
-                                                            <img src="{{ asset('storage/' . config('insights.blog_upload_dir') . '/image_thumbnail/' . $relatedTranslation->image_thumbnail) }}"
+                                                            <img src="{{ url('/insights/images/' . $relatedTranslation->image_thumbnail) }}"
                                                                 alt="{{ $relatedTranslation->title }}"
                                                                 class="w-full h-full object-cover">
                                                         </div>

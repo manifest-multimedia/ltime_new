@@ -10,6 +10,10 @@ Route::middleware(['web'])->group(function () {
         Route::get('/', [InsightsController::class, 'index'])->name('insights.index');
         Route::get('/search', [InsightsController::class, 'search'])->name('insights.search');
         Route::get('/category/{slug}', [InsightsController::class, 'category'])->name('insights.category');
+        
+        // Images route - place this before the slug route to prevent conflicts
+        Route::get('/images/{filename}', [InsightsController::class, 'serveImage'])->name('insights.images');
+        
         Route::get('/{slug}', [InsightsController::class, 'show'])->name('insights.show');
 
         // Comments

@@ -11,6 +11,9 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <h5 class="mb-0 text-dark">Edit Post</h5>
                             <div>
+                                <button type="button" onclick="document.getElementById('post-edit-form').submit();" class="btn btn-sm btn-primary mr-2">
+                                    <i class="fas fa-save mr-1"></i> Save Changes
+                                </button>
                                 <a href="{{ route('insights.admin.index') }}" class="btn btn-sm btn-secondary">
                                     <i class="fas fa-arrow-left mr-1"></i> Back to Posts
                                 </a>
@@ -18,7 +21,28 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('insights.admin.update', $post->id) }}" method="POST" enctype="multipart/form-data">
+                        @if(session('success'))
+                            <div class="alert alert-success alert-dismissible fade show">
+                                {{ session('success') }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        @endif
+
+                        @if(session('error'))
+                            <div class="alert alert-danger alert-dismissible fade show">
+                                {{ session('error') }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        @endif
+                        
+                        <!-- Debug info to help identify what's being sent -->
+                        <div class="d-none">Post ID: {{ $post->id }}</div>
+
+                        <form action="{{ route('insights.admin.update', $post->id) }}" method="POST" enctype="multipart/form-data" id="post-edit-form">
                             @csrf
                             @method('PUT')
                             
@@ -56,3 +80,17 @@
         </div>
     </div>
 @endsection
+
+@push('page-scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add form submission handling
+    const form = document.getElementById('post-edit-form');
+    form.addEventListener('submit', function(e) {
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Updating...';
+    });
+});
+</script>
+@endpush

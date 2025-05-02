@@ -196,17 +196,84 @@ class InsightsAdminController extends Controller
     public function update(Request $request, $id)
     {
         try {
+            // Handle cases where the entire post object is passed instead of just the ID
+            if (is_string($id) && strpos($id, '{') === 0) {
+                // This looks like a JSON string of a post object
+                $postData = json_decode($id, true);
+                if (json_last_error() === JSON_ERROR_NONE && isset($postData['id'])) {
+                    $id = $postData['id'];
+                    \Log::info("Extracted post ID {$id} from JSON string", ['original_input' => $id]);
+                }
+            } else if (is_object($id)) {
+                // This is likely an object of some kind
+                if (method_exists($id, 'getId')) {
+                    // Try to get the ID using a getter if available
+                    $id = $id->getId();
+                    \Log::info("Extracted post ID {$id} using getId() method");
+                } else if (method_exists($id, 'id')) {
+                    // Try another common method name
+                    $id = $id->id();
+                    \Log::info("Extracted post ID {$id} using id() method");
+                } else if (property_exists($id, 'id')) {
+                    // Try to access the id property directly
+                    $id = $id->id;
+                    \Log::info("Extracted post ID {$id} from id property");
+                } else if (method_exists($id, 'toArray')) {
+                    // Try converting to array and get id from there
+                    $data = $id->toArray();
+                    if (isset($data['id'])) {
+                        $id = $data['id'];
+                        \Log::info("Extracted post ID {$id} from toArray() method");
+                    }
+                } else {
+                    // Last resort: cast to string and check if it's numeric
+                    $strId = (string)$id;
+                    if (is_numeric($strId)) {
+                        $id = (int)$strId;
+                        \Log::info("Extracted post ID {$id} by casting to string");
+                    } else {
+                        // If we can't get an ID, dump the object for debugging
+                        \Log::warning("Could not extract ID from object", ['object_class' => get_class($id)]);
+                    }
+                }
+            } else if (is_array($id) && isset($id['id'])) {
+                // In case the ID is an array with an 'id' key
+                $id = $id['id'];
+                \Log::info("Extracted post ID {$id} from array");
+            }
+            
+            // Make sure we have a numeric ID at this point
+            if (!is_numeric($id)) {
+                \Log::error("Non-numeric post ID provided for updating after extraction attempt: " . print_r($id, true));
+                throw new \Exception("Invalid post ID format: " . print_r($id, true));
+            }
+            
+            // Now we should have a proper numeric ID
+            $numericId = (int)$id;
+            
             // Get the post with translations eager loaded
-            $post = Post::with('translations')->find($id);
+            $post = Post::find($numericId);
             
             // If no post found, throw an exception
             if (!$post) {
-                \Log::error("Post not found with ID: {$id}");
-                throw new \Exception("Post not found with ID: {$id}");
+                \Log::error("Post not found with ID: {$numericId}");
+                throw new \Exception("Post not found with ID: {$numericId}");
             }
             
+            // Log detailed information about what we have
+            \Log::info("Updating post with ID: {$numericId}", [
+                'title' => $request->title,
+                'slug' => $request->slug,
+                'post_id' => $post->id,
+                'post_class' => get_class($post)
+            ]);
+            
+            // Explicitly load translations to ensure they're available
+            $translations = PostTranslation::where('post_id', $post->id)->get();
+            $post->setRelation('translations', $translations);
+            
             // Find the current translation for the requested language if it exists
-            $currentTranslation = $post->translations->where('lang_id', $request->lang_id)->first();
+            $currentTranslation = $translations->where('lang_id', $request->lang_id)->first();
             $translationId = $currentTranslation ? $currentTranslation->id : null;
             
             $this->validate($request, [
@@ -219,19 +286,17 @@ class InsightsAdminController extends Controller
                 'image' => 'nullable|image',
             ]);
 
-            \Log::info("Updating post with ID: {$id}", [
-                'title' => $request->title,
-                'slug' => $request->slug
-            ]);
-
             $post->update([
                 'posted_at' => $request->posted_at ?? now(),
                 'is_published' => $request->has('is_published'),
             ]);
 
-            // Update or create the translation
-            $translation = $post->translations()->updateOrCreate(
-                ['lang_id' => $request->lang_id],
+            // Update or create the translation - using direct query instead of relationship to avoid issues
+            $translation = PostTranslation::updateOrCreate(
+                [
+                    'post_id' => $post->id,
+                    'lang_id' => $request->lang_id
+                ],
                 [
                     'title' => $request->title,
                     'subtitle' => $request->subtitle,
@@ -243,23 +308,25 @@ class InsightsAdminController extends Controller
                 ]
             );
 
-            // Reload the translations relation after update
-            $post->load('translations');
+            // Store the post ID for redirect (ensuring it's a simple numeric value)
+            $postId = (int)$post->id;
 
-            // Handle image upload after ensuring translations exist
+            // Handle image upload
             if ($request->hasFile('image')) {
                 $this->handleImageUpload($request->file('image'), $post);
             }
 
+            // Handle categories
             if ($request->has('categories')) {
                 $post->categories()->sync($request->categories);
             } else {
                 $post->categories()->detach();
             }
 
-            \Log::info("Post updated successfully: {$id}");
+            \Log::info("Post updated successfully: {$postId}");
 
-            return redirect()->route('insights.admin.index')
+            // Redirect back to the edit page using the numeric ID
+            return redirect()->route('insights.admin.edit', $postId)
                 ->with('success', 'Post updated successfully');
                 
         } catch (\Exception $e) {
