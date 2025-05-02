@@ -6,14 +6,13 @@ use App\Http\Controllers\Insights\InsightsAdminController;
 
 // Public routes
 Route::middleware(['web'])->group(function () {
+    // Images route - place this outside the prefix group to match /insights_images directly
+    Route::get('/insights_images/{filename}', [InsightsController::class, 'serveImage'])->name('insights.images');
+    
     Route::prefix(config('insights.blog_prefix', 'insights'))->group(function () {
         Route::get('/', [InsightsController::class, 'index'])->name('insights.index');
         Route::get('/search', [InsightsController::class, 'search'])->name('insights.search');
         Route::get('/category/{slug}', [InsightsController::class, 'category'])->name('insights.category');
-        
-        // Images route - place this before the slug route to prevent conflicts
-        Route::get('/images/{filename}', [InsightsController::class, 'serveImage'])->name('insights.images');
-        
         Route::get('/{slug}', [InsightsController::class, 'show'])->name('insights.show');
 
         // Comments

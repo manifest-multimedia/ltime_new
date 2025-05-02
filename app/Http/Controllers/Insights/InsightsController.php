@@ -165,7 +165,7 @@ class InsightsController extends Controller
         }
         
         // The actual path in storage where the image is stored
-        $path = storage_path('app/public/' . config('insights.blog_upload_dir') . '/' . $imageType . '/' . $filename);
+        $path = storage_path('app/public/insights_images/' . $imageType . '/' . $filename);
         
         // Make sure the file exists
         if (!file_exists($path)) {

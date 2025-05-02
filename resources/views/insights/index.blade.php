@@ -17,7 +17,7 @@
                         @if($featuredTranslation && $featuredTranslation->image_large)
                             <div class="md:w-1/2">
                                 <div class="h-full aspect-w-16 aspect-h-9">
-                                    <img src="{{ asset('storage/' . config('insights.blog_upload_dir') . '/image_large/' . $featuredTranslation->image_large) }}"
+                                    <img src="{{ url('/insights_images/' . $featuredTranslation->image_large) }}"
                                          alt="{{ $featuredTranslation->title }}"
                                          class="w-full h-full object-cover">
                                 </div>
@@ -93,7 +93,7 @@
                                     @if($translation->image_medium)
                                         <a href="{{ route('insights.show', $translation->slug) }}" class="block">
                                             <div class="aspect-w-16 aspect-h-9">
-                                                <img src="{{ asset('storage/' . config('insights.blog_upload_dir') . '/image_medium/' . $translation->image_medium) }}"
+                                                <img src="{{ url('/insights_images/' . $translation->image_medium) }}"
                                                     alt="{{ $translation->title }}"
                                                     class="w-full h-full object-cover transition-transform duration-300 hover:scale-105">
                                             </div>

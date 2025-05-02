@@ -20,7 +20,7 @@
                                     <div class="md:flex md:items-start">
                                         @if($post->translations->first()->image_medium)
                                             <div class="md:w-1/3 md:flex-shrink-0 mb-4 md:mb-0 md:mr-6">
-                                                <img src="{{ asset('storage/' . config('insights.blog_upload_dir') . '/image_medium/' . $post->translations->first()->image_medium) }}"
+                                                <img src="{{ url('/insights_images/' . $post->translations->first()->image_medium) }}"
                                                      alt="{{ $post->translations->first()->title }}"
                                                      class="w-full h-48 object-cover rounded-lg">
                                             </div>

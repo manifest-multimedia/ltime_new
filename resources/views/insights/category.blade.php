@@ -32,7 +32,7 @@
                                     @if($post->translations->first()->image_medium)
                                         <a href="{{ route('insights.show', $post->translations->first()->slug) }}" class="block">
                                             <div class="aspect-w-16 aspect-h-9">
-                                                <img src="{{ asset('storage/' . config('insights.blog_upload_dir') . '/image_medium/' . $post->translations->first()->image_medium) }}"
+                                                <img src="{{ url('/insights_images/' . $post->translations->first()->image_medium) }}"
                                                     alt="{{ $post->translations->first()->title }}"
                                                     class="w-full h-full object-cover transition-transform duration-300 hover:scale-105">
                                             </div>

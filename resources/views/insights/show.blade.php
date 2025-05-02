@@ -71,7 +71,7 @@
 
                 @if($translation && $translation->image_large)
                     <div class="w-full aspect-w-16 aspect-h-9 mb-8 overflow-hidden rounded-lg shadow-lg">
-                        <img src="{{ url('/insights/images/' . $translation->image_large) }}"
+                        <img src="{{ url('/insights_images/' . $translation->image_large) }}"
                              alt="{{ $translation->title }}"
                              class="w-full h-full object-cover">
                     </div>
@@ -292,7 +292,7 @@
                                                 @if($relatedTranslation->image_thumbnail)
                                                     <a href="{{ route('insights.show', $relatedTranslation->slug) }}" class="flex-shrink-0 mr-3">
                                                         <div class="w-16 h-16 rounded overflow-hidden">
-                                                            <img src="{{ url('/insights/images/' . $relatedTranslation->image_thumbnail) }}"
+                                                            <img src="{{ url('/insights_images/' . $relatedTranslation->image_thumbnail) }}"
                                                                 alt="{{ $relatedTranslation->title }}"
                                                                 class="w-full h-full object-cover">
                                                         </div>
