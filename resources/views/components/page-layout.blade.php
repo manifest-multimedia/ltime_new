@@ -29,8 +29,8 @@
 <link href="{{asset("assets/css/switcher-style.css")}}" rel="stylesheet" type="text/css">
 <link href="{{asset("assets/css/style.css")}}" rel="stylesheet" type="text/css">
 <link href="{{asset("assets/css/responsive.css")}}" rel="stylesheet" type="text/css">
-<livewire:styles />
 
+<!-- Livewire styles now included via Vite -->
 @vite(['resources/js/app.js', 'resources/css/app.css'])
 
 </head>

@@ -94,7 +94,6 @@
 </button>
 </div>
 
-@livewireScripts
 
 <!-- jquery plugins -->
 <script src="{{asset("assets/js/jquery.js")}}"></script>
