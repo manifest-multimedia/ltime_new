@@ -28,7 +28,7 @@ Route::middleware(['web', 'auth', 'insights.admin'])->group(function () {
         Route::post('/', [InsightsAdminController::class, 'store'])->name('insights.admin.store');
         Route::get('/{post}/edit', [InsightsAdminController::class, 'edit'])->name('insights.admin.edit');
         Route::put('/{post}', [InsightsAdminController::class, 'update'])->name('insights.admin.update');
-        Route::delete('/{post}', [InsightsAdminController::class, 'destroy'])->name('insights.admin.destroy');
+        Route::delete('/{post_id}', [InsightsAdminController::class, 'destroy'])->name('insights.admin.destroy');
 
         // Categories management
         Route::prefix('categories')->group(function () {

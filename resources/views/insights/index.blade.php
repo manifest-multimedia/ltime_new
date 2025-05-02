@@ -10,14 +10,15 @@
             @if($posts->count() > 0)
                 @php
                     $featuredPost = $posts->first();
+                    $featuredTranslation = $featuredPost->translations->first();
                 @endphp
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg mb-8">
                     <div class="md:flex">
-                        @if($featuredPost->translations->first()->image_large)
+                        @if($featuredTranslation && $featuredTranslation->image_large)
                             <div class="md:w-1/2">
                                 <div class="h-full aspect-w-16 aspect-h-9">
-                                    <img src="{{ asset('storage/' . config('insights.blog_upload_dir') . '/image_large/' . $featuredPost->translations->first()->image_large) }}"
-                                         alt="{{ $featuredPost->translations->first()->title }}"
+                                    <img src="{{ asset('storage/' . config('insights.blog_upload_dir') . '/image_large/' . $featuredTranslation->image_large) }}"
+                                         alt="{{ $featuredTranslation->title }}"
                                          class="w-full h-full object-cover">
                                 </div>
                             </div>
@@ -29,32 +30,38 @@
                                 </span>
                                 @if($featuredPost->categories->count())
                                     @foreach($featuredPost->categories->take(2) as $category)
+                                        @if($category->translations->isNotEmpty() && $category->translations->first()->slug)
                                         <a href="{{ route('insights.category', $category->translations->first()->slug) }}"
                                            class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-gray-600 bg-gray-50 last:mr-0 mr-1">
-                                            {{ $category->translations->first()->category_name }}
+                                            {{ $category->translations->first()->category_name ?? 'Category' }}
                                         </a>
+                                        @endif
                                     @endforeach
                                 @endif
                             </div>
+                            @if($featuredTranslation)
                             <h1 class="text-3xl font-bold mb-4">
-                                <a href="{{ route('insights.show', $featuredPost->translations->first()->slug) }}"
+                                <a href="{{ route('insights.show', $featuredTranslation->slug) }}"
                                    class="text-gray-900 hover:text-blue-600">
-                                    {{ $featuredPost->translations->first()->title }}
+                                    {{ $featuredTranslation->title }}
                                 </a>
                             </h1>
-                            @if($featuredPost->translations->first()->short_description)
+                            @if($featuredTranslation->short_description)
                                 <p class="text-lg text-gray-600 mb-6">
-                                    {{ Str::limit($featuredPost->translations->first()->short_description, 200) }}
+                                    {{ Str::limit($featuredTranslation->short_description, 200) }}
                                 </p>
+                            @endif
                             @endif
                             <div class="mt-auto flex items-center justify-between">
                                 <div class="text-sm text-gray-500">
                                     {{ $featuredPost->posted_at->format('F j, Y') }}
                                 </div>
-                                <a href="{{ route('insights.show', $featuredPost->translations->first()->slug) }}"
+                                @if($featuredTranslation)
+                                <a href="{{ route('insights.show', $featuredTranslation->slug) }}"
                                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                     Read More
                                 </a>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -80,12 +87,14 @@
                     @if(count($posts) > 1)
                         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                             @foreach($posts->skip(1) as $post)
+                                @php $translation = $post->translations->first(); @endphp
+                                @if($translation)
                                 <article class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-shadow duration-300">
-                                    @if($post->translations->first()->image_medium)
-                                        <a href="{{ route('insights.show', $post->translations->first()->slug) }}" class="block">
+                                    @if($translation->image_medium)
+                                        <a href="{{ route('insights.show', $translation->slug) }}" class="block">
                                             <div class="aspect-w-16 aspect-h-9">
-                                                <img src="{{ asset('storage/' . config('insights.blog_upload_dir') . '/image_medium/' . $post->translations->first()->image_medium) }}"
-                                                    alt="{{ $post->translations->first()->title }}"
+                                                <img src="{{ asset('storage/' . config('insights.blog_upload_dir') . '/image_medium/' . $translation->image_medium) }}"
+                                                    alt="{{ $translation->title }}"
                                                     class="w-full h-full object-cover transition-transform duration-300 hover:scale-105">
                                             </div>
                                         </a>
@@ -95,24 +104,26 @@
                                         @if($post->categories->count())
                                             <div class="mb-3">
                                                 @foreach($post->categories->take(3) as $category)
+                                                    @if($category->translations->isNotEmpty() && $category->translations->first()->slug)
                                                     <a href="{{ route('insights.category', $category->translations->first()->slug) }}"
                                                     class="inline-block bg-gray-50 text-gray-600 text-xs px-2 py-1 rounded-full mr-2 mb-2 hover:bg-gray-100">
-                                                        {{ $category->translations->first()->category_name }}
+                                                        {{ $category->translations->first()->category_name ?? 'Category' }}
                                                     </a>
+                                                    @endif
                                                 @endforeach
                                             </div>
                                         @endif
 
                                         <h3 class="text-xl font-semibold mb-3">
-                                            <a href="{{ route('insights.show', $post->translations->first()->slug) }}"
+                                            <a href="{{ route('insights.show', $translation->slug) }}"
                                             class="text-gray-900 hover:text-blue-600">
-                                                {{ $post->translations->first()->title }}
+                                                {{ $translation->title }}
                                             </a>
                                         </h3>
 
-                                        @if($post->translations->first()->short_description)
+                                        @if($translation->short_description)
                                             <p class="text-gray-600 mb-4 text-sm">
-                                                {{ Str::limit($post->translations->first()->short_description, 120) }}
+                                                {{ Str::limit($translation->short_description, 120) }}
                                             </p>
                                         @endif
 
@@ -120,7 +131,7 @@
                                             <div class="text-gray-500">
                                                 {{ $post->posted_at->format('M j, Y') }}
                                             </div>
-                                            <a href="{{ route('insights.show', $post->translations->first()->slug) }}"
+                                            <a href="{{ route('insights.show', $translation->slug) }}"
                                             class="text-blue-600 hover:text-blue-800 font-medium inline-flex items-center">
                                                 Read More
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -130,6 +141,9 @@
                                         </div>
                                     </div>
                                 </article>
+                                @else
+                                <!-- Skip posts without translations -->
+                                @endif
                             @endforeach
                         </div>
 

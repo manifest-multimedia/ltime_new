@@ -15,6 +15,18 @@
                         </a>
                     </div>
 
+                    @if(session('success'))
+                        <div class="alert alert-success mb-4">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+
+                    @if(session('error'))
+                        <div class="alert alert-danger mb-4">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+
                     @if($posts->count())
                         <div class="table-responsive">
                             <table class="table table-bordered table-hover">
@@ -32,17 +44,27 @@
                                         <tr>
                                             <td>
                                                 <div class="font-weight-bold">
-                                                    {{ $post->translations->first()->title }}
+                                                    @if($post->translations->isNotEmpty())
+                                                        {{ $post->translations->first()->title }}
+                                                    @else
+                                                        <span class="text-muted">[No title]</span>
+                                                    @endif
                                                 </div>
                                                 <div class="text-muted small">
-                                                    {{ Str::limit($post->translations->first()->short_description, 50) }}
+                                                    @if($post->translations->isNotEmpty() && $post->translations->first()->short_description)
+                                                        {{ Str::limit($post->translations->first()->short_description, 50) }}
+                                                    @else
+                                                        <span class="text-muted">[No description]</span>
+                                                    @endif
                                                 </div>
                                             </td>
                                             <td>
                                                 @foreach($post->categories as $category)
-                                                    <span class="badge badge-info">
-                                                        {{ $category->translations->first()->category_name }}
-                                                    </span>
+                                                    @if($category->translations->isNotEmpty())
+                                                        <span class="badge badge-info">
+                                                            {{ $category->translations->first()->category_name }}
+                                                        </span>
+                                                    @endif
                                                 @endforeach
                                             </td>
                                             <td>
@@ -61,14 +83,16 @@
                                             </td>
                                             <td class="text-center">
                                                 <div class="d-flex justify-content-center">
-                                                    <a href="{{ route('insights.show', $post->translations->first()->slug) }}" 
-                                                       target="_blank"
-                                                       class="btn btn-sm btn-info mr-2">
-                                                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye">
-                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                                            <circle cx="12" cy="12" r="3"></circle>
-                                                        </svg>
-                                                    </a>
+                                                    @if($post->translations->isNotEmpty())
+                                                        <a href="{{ route('insights.show', $post->translations->first()->slug) }}" 
+                                                           target="_blank"
+                                                           class="btn btn-sm btn-info mr-2">
+                                                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye">
+                                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                                <circle cx="12" cy="12" r="3"></circle>
+                                                            </svg>
+                                                        </a>
+                                                    @endif
                                                     <a href="{{ route('insights.admin.edit', $post->id) }}" 
                                                        class="btn btn-sm btn-primary mr-2">
                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit-2">

@@ -29,83 +29,37 @@ class InsightsAdminController extends Controller
     public function create()
     {
         $categories = Category::with('translations')->get();
-        return view('insights.admin.create', compact('categories'));
+        $post = new Post(); // Create an empty post instance to prevent undefined variable errors
+        return view('insights.admin.create', compact('categories', 'post'));
     }
 
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'title' => 'required',
-            'post_body' => 'required',
-            'slug' => 'required|unique:insights_post_translations,slug',
-            'lang_id' => 'required|exists:insights_languages,id',
-            'categories' => 'array',
-            'posted_at' => 'nullable|date',
-            'image' => 'nullable|image',
-        ]);
+        try {
+            $this->validate($request, [
+                'title' => 'required',
+                'post_body' => 'required',
+                'slug' => 'required|unique:insights_post_translations,slug',
+                'lang_id' => 'required|exists:insights_languages,id',
+                'categories' => 'array',
+                'posted_at' => 'nullable|date',
+                'image' => 'nullable|image',
+            ]);
 
-        $post = Post::create([
-            'user_id' => Auth::id(),
-            'posted_at' => $request->posted_at ?? now(),
-            'is_published' => $request->is_published ?? false,
-        ]);
+            // Create the post first
+            $post = Post::create([
+                'user_id' => Auth::id(),
+                'posted_at' => $request->posted_at ?? now(),
+                'is_published' => $request->has('is_published'),
+            ]);
 
-        if ($request->hasFile('image')) {
-            $this->handleImageUpload($request->file('image'), $post);
-        }
+            \Log::info("Post created with ID: {$post->id}", [
+                'title' => $request->title,
+                'is_published' => $post->is_published,
+            ]);
 
-        $post->translations()->create([
-            'title' => $request->title,
-            'subtitle' => $request->subtitle,
-            'short_description' => $request->short_description,
-            'post_body' => $request->post_body,
-            'slug' => Str::slug($request->slug),
-            'meta_desc' => $request->meta_desc,
-            'seo_title' => $request->seo_title,
-            'lang_id' => $request->lang_id,
-        ]);
-
-        if ($request->categories) {
-            $post->categories()->sync($request->categories);
-        }
-
-        return redirect()->route('insights.admin.index')
-            ->with('success', 'Post created successfully');
-    }
-
-    public function edit($id)
-    {
-        $post = Post::with(['translations', 'categories'])->findOrFail($id);
-        $categories = Category::with('translations')->get();
-        return view('insights.admin.edit', compact('post', 'categories'));
-    }
-
-    public function update(Request $request, $id)
-    {
-        $post = Post::findOrFail($id);
-        
-        $this->validate($request, [
-            'title' => 'required',
-            'post_body' => 'required',
-            'slug' => 'required|unique:insights_post_translations,slug,' . $post->id . ',post_id',
-            'lang_id' => 'required|exists:insights_languages,id',
-            'categories' => 'array',
-            'posted_at' => 'nullable|date',
-            'image' => 'nullable|image',
-        ]);
-
-        $post->update([
-            'posted_at' => $request->posted_at ?? now(),
-            'is_published' => $request->is_published ?? false,
-        ]);
-
-        if ($request->hasFile('image')) {
-            $this->handleImageUpload($request->file('image'), $post);
-        }
-
-        $post->translations()->updateOrCreate(
-            ['lang_id' => $request->lang_id],
-            [
+            // Create the translation immediately before image handling
+            $translation = $post->translations()->create([
                 'title' => $request->title,
                 'subtitle' => $request->subtitle,
                 'short_description' => $request->short_description,
@@ -113,29 +67,252 @@ class InsightsAdminController extends Controller
                 'slug' => Str::slug($request->slug),
                 'meta_desc' => $request->meta_desc,
                 'seo_title' => $request->seo_title,
-            ]
-        );
+                'lang_id' => $request->lang_id,
+            ]);
 
-        if ($request->has('categories')) {
-            $post->categories()->sync($request->categories);
+            // Make sure to load the translation relation
+            $post->load('translations');
+
+            // Now handle image upload after translation is created
+            if ($request->hasFile('image')) {
+                $this->handleImageUpload($request->file('image'), $post);
+            }
+
+            if ($request->categories) {
+                $post->categories()->sync($request->categories);
+            }
+
+            return redirect()->route('insights.admin.index')
+                ->with('success', 'Post created successfully');
+        } catch (\Exception $e) {
+            \Log::error("Error creating post: " . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'request' => $request->except(['_token']),
+            ]);
+            
+            return redirect()->back()
+                ->with('error', 'Error creating post: ' . $e->getMessage())
+                ->withInput();
         }
-
-        return redirect()->route('insights.admin.index')
-            ->with('success', 'Post updated successfully');
     }
 
-    public function destroy($id)
+    public function edit($id)
     {
-        $post = Post::findOrFail($id);
-        $post->delete();
+        try {
+            // Explicitly find the post by ID
+            $post = Post::find($id);
+            
+            // If no post found, throw an exception
+            if (!$post) {
+                \Log::error("Post not found with ID: {$id}");
+                throw new \Exception("Post not found with ID: {$id}");
+            }
+            
+            // Eager load translations and categories to avoid N+1 queries
+            $post->load(['translations', 'categories']);
+            
+            $categories = Category::with('translations')->get();
+            
+            // Make sure translations is initialized as a collection, even if it's empty
+            if (!$post->relationLoaded('translations') || !($post->translations instanceof \Illuminate\Support\Collection)) {
+                $post->setRelation('translations', collect([]));
+            }
+            
+            // If the post has no translations, create a properly initialized dummy translation object for the form
+            if ($post->translations->isEmpty()) {
+                $defaultLang = \App\Models\Insights\Language::getDefault();
+                $tempTranslation = new PostTranslation();
+                
+                // Initialize all required fields with empty values to prevent null errors
+                $tempTranslation->post_id = $post->id;
+                $tempTranslation->title = '';
+                $tempTranslation->slug = '';
+                $tempTranslation->post_body = '';
+                $tempTranslation->short_description = '';
+                $tempTranslation->subtitle = '';
+                $tempTranslation->meta_desc = '';
+                $tempTranslation->seo_title = '';
+                $tempTranslation->lang_id = $defaultLang ? $defaultLang->id : 1; // Default to 1 if no default found
+                
+                $post->setRelation('translations', collect([$tempTranslation]));
+            }
+            
+            return view('insights.admin.edit', compact('post', 'categories'));
+        } catch (\Exception $e) {
+            \Log::error("Error editing post: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return redirect()->route('insights.admin.index')
+                ->with('error', 'Error editing post: ' . $e->getMessage());
+        }
+    }
 
-        return redirect()->route('insights.admin.index')
-            ->with('success', 'Post deleted successfully');
+    public function update(Request $request, $id)
+    {
+        try {
+            // Get the post with translations eager loaded
+            $post = Post::with('translations')->find($id);
+            
+            // If no post found, throw an exception
+            if (!$post) {
+                \Log::error("Post not found with ID: {$id}");
+                throw new \Exception("Post not found with ID: {$id}");
+            }
+            
+            // Find the current translation for the requested language if it exists
+            $currentTranslation = $post->translations->where('lang_id', $request->lang_id)->first();
+            $translationId = $currentTranslation ? $currentTranslation->id : null;
+            
+            $this->validate($request, [
+                'title' => 'required',
+                'post_body' => 'required',
+                'slug' => 'required|unique:insights_post_translations,slug,' . $translationId,
+                'lang_id' => 'required|exists:insights_languages,id',
+                'categories' => 'array',
+                'posted_at' => 'nullable|date',
+                'image' => 'nullable|image',
+            ]);
+
+            \Log::info("Updating post with ID: {$id}", [
+                'title' => $request->title,
+                'slug' => $request->slug
+            ]);
+
+            $post->update([
+                'posted_at' => $request->posted_at ?? now(),
+                'is_published' => $request->has('is_published'),
+            ]);
+
+            // Update or create the translation
+            $translation = $post->translations()->updateOrCreate(
+                ['lang_id' => $request->lang_id],
+                [
+                    'title' => $request->title,
+                    'subtitle' => $request->subtitle,
+                    'short_description' => $request->short_description,
+                    'post_body' => $request->post_body,
+                    'slug' => Str::slug($request->slug),
+                    'meta_desc' => $request->meta_desc,
+                    'seo_title' => $request->seo_title,
+                ]
+            );
+
+            // Reload the translations relation after update
+            $post->load('translations');
+
+            // Handle image upload after ensuring translations exist
+            if ($request->hasFile('image')) {
+                $this->handleImageUpload($request->file('image'), $post);
+            }
+
+            if ($request->has('categories')) {
+                $post->categories()->sync($request->categories);
+            } else {
+                $post->categories()->detach();
+            }
+
+            \Log::info("Post updated successfully: {$id}");
+
+            return redirect()->route('insights.admin.index')
+                ->with('success', 'Post updated successfully');
+                
+        } catch (\Exception $e) {
+            \Log::error("Error updating post: " . $e->getMessage(), [
+                'post_id' => $id,
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return redirect()->back()
+                ->with('error', 'Error updating post: ' . $e->getMessage())
+                ->withInput();
+        }
+    }
+
+    public function destroy($post_id)
+    {
+        try {
+            // Make sure we have a valid numeric ID
+            if (!is_numeric($post_id)) {
+                \Log::error("Invalid post ID format for deletion: {$post_id}");
+                return redirect()->route('insights.admin.index')
+                    ->with('error', 'Invalid post ID format');
+            }
+            
+            // Find the post using the numeric ID
+            $post = Post::with('translations')->find($post_id);
+            
+            if (!$post) {
+                \Log::error("Post not found for deletion with ID: {$post_id}");
+                return redirect()->route('insights.admin.index')
+                    ->with('error', 'Post not found with ID: ' . $post_id);
+            }
+            
+            \Log::info("Deleting post with ID: {$post_id}", [
+                'post_id' => $post->id,
+                'translation_count' => $post->translations->count()
+            ]);
+            
+            // Use a database transaction to ensure all related data is properly deleted
+            \DB::beginTransaction();
+            
+            try {
+                // Remove category associations
+                $post->categories()->detach();
+                
+                // Delete any comments
+                $post->comments()->delete();
+                
+                // Delete translations - they should automatically be deleted by the foreign key constraint
+                // but we'll ensure they're gone
+                $post->translations()->delete();
+                
+                // Finally delete the post itself
+                $post->delete();
+                
+                \DB::commit();
+                
+                \Log::info("Post deleted successfully: {$post_id}");
+                
+                return redirect()->route('insights.admin.index')
+                    ->with('success', 'Post deleted successfully');
+            } catch (\Exception $innerException) {
+                \DB::rollBack();
+                throw $innerException;
+            }
+        } catch (\Exception $e) {
+            \Log::error("Error deleting post: " . $e->getMessage(), [
+                'post_id' => $post_id,
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return redirect()->route('insights.admin.index')
+                ->with('error', 'Error deleting post: ' . $e->getMessage());
+        }
     }
 
     protected function handleImageUpload($image, Post $post)
     {
-        $filename = Str::slug($post->translations->first()->title) . '-' . time() . '.' . $image->getClientOriginalExtension();
+        // Always load the translations first to ensure they're available
+        $post = $post->fresh(['translations']);
+        
+        // Check if post has translations, if not, this could be an issue
+        if ($post->translations->isEmpty()) {
+            \Log::error("Cannot upload image: post has no translations", ['post_id' => $post->id]);
+            throw new \Exception("Post must have at least one translation before uploading an image.");
+        }
+        
+        // Use the loaded translations collection
+        $currentTranslation = $post->translations->sortByDesc('updated_at')->first();
+        if (!$currentTranslation) {
+            \Log::error("Cannot determine current translation for image upload", ['post_id' => $post->id]);
+            throw new \Exception("Cannot determine which translation to update with the image.");
+        }
+        
+        $filename = Str::slug($currentTranslation->title) . '-' . time() . '.' . $image->getClientOriginalExtension();
+        
+        \Log::info("Uploading image for post", [
+            'post_id' => $post->id,
+            'translation_id' => $currentTranslation->id,
+            'filename' => $filename
+        ]);
         
         foreach (config('insights.image_sizes') as $size => $data) {
             if (!$data['enabled']) continue;
@@ -158,7 +335,8 @@ class InsightsAdminController extends Controller
 
             $resizedImage->save($path . '/' . $filename);
             
-            $post->translations()->update([
+            // Update only the current translation with the new image
+            $currentTranslation->update([
                 $size => $filename
             ]);
         }

@@ -1,7 +1,11 @@
 @extends('insights.layouts.app')
 
-@section('title', $post->translations->first()->seo_title ?? $post->translations->first()->title)
-@section('meta_desc', $post->translations->first()->meta_desc ?? $post->translations->first()->short_description)
+@php
+    $translation = $post->translations->first();
+@endphp
+
+@section('title', $translation ? ($translation->seo_title ?? $translation->title) : 'Post')
+@section('meta_desc', $translation ? ($translation->meta_desc ?? $translation->short_description) : '')
 
 @section('content')
     <article class="py-8 lg:py-12">
@@ -12,22 +16,27 @@
                     @if($post->categories->count())
                         <div class="mb-4">
                             @foreach($post->categories as $category)
-                                <a href="{{ route('insights.category', $category->translations->first()->slug) }}"
+                                @php $categoryTranslation = $category->translations->first(); @endphp
+                                @if($categoryTranslation)
+                                <a href="{{ route('insights.category', $categoryTranslation->slug) }}"
                                    class="inline-block bg-gray-100 text-gray-800 text-xs px-3 py-1 rounded-full mr-2 transition-colors hover:bg-gray-200">
-                                    {{ $category->translations->first()->category_name }}
+                                    {{ $categoryTranslation->category_name }}
                                 </a>
+                                @endif
                             @endforeach
                         </div>
                     @endif
 
+                    @if($translation)
                     <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-                        {{ $post->translations->first()->title }}
+                        {{ $translation->title }}
                     </h1>
 
-                    @if($post->translations->first()->subtitle)
+                    @if($translation->subtitle)
                         <p class="text-xl text-gray-600 mb-4 max-w-4xl mx-auto">
-                            {{ $post->translations->first()->subtitle }}
+                            {{ $translation->subtitle }}
                         </p>
+                    @endif
                     @endif
 
                     <div class="flex items-center justify-center text-sm text-gray-500 space-x-4">
@@ -48,10 +57,10 @@
                     </div>
                 </header>
 
-                @if($post->translations->first()->image_large)
+                @if($translation && $translation->image_large)
                     <div class="w-full aspect-w-16 aspect-h-9 mb-8 overflow-hidden rounded-lg shadow-lg">
-                        <img src="{{ asset('storage/' . config('insights.blog_upload_dir') . '/image_large/' . $post->translations->first()->image_large) }}"
-                             alt="{{ $post->translations->first()->title }}"
+                        <img src="{{ asset('storage/' . config('insights.blog_upload_dir') . '/image_large/' . $translation->image_large) }}"
+                             alt="{{ $translation->title }}"
                              class="w-full h-full object-cover">
                     </div>
                 @endif
@@ -63,7 +72,7 @@
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div class="p-6 md:p-8">
                             <div class="prose lg:prose-lg max-w-none">
-                                {!! $post->translations->first()->post_body !!}
+                                {!! $translation ? $translation->post_body : '' !!}
                             </div>
 
                             <!-- Social Share -->
@@ -71,7 +80,7 @@
                                 <div class="flex items-center">
                                     <span class="text-sm font-medium text-gray-700 mr-4">Share this post:</span>
                                     <div class="flex space-x-2">
-                                        <a href="https://twitter.com/intent/tweet?url={{ urlencode(request()->url()) }}&text={{ urlencode($post->translations->first()->title) }}" 
+                                        <a href="https://twitter.com/intent/tweet?url={{ urlencode(request()->url()) }}&text={{ urlencode($translation ? $translation->title : '') }}" 
                                            target="_blank" 
                                            class="text-gray-500 hover:text-blue-400 transition-colors">
                                             <span class="sr-only">Twitter</span>
@@ -146,7 +155,7 @@
 
                                 <div class="mt-8">
                                     <h3 class="text-xl font-semibold mb-4">Leave a Comment</h3>
-                                    <form action="{{ route('insights.comments.store', $post->translations->first()->slug) }}" method="POST" class="space-y-4">
+                                    <form action="{{ route('insights.comments.store', $translation ? $translation->slug : '') }}" method="POST" class="space-y-4">
                                         @csrf
                                         
                                         @guest
@@ -233,10 +242,13 @@
                                     <h3 class="text-lg font-semibold mb-3 border-b pb-2">Categories</h3>
                                     <div class="flex flex-wrap">
                                         @foreach($post->categories as $category)
-                                            <a href="{{ route('insights.category', $category->translations->first()->slug) }}"
+                                            @php $categoryTranslation = $category->translations->first(); @endphp
+                                            @if($categoryTranslation)
+                                            <a href="{{ route('insights.category', $categoryTranslation->slug) }}"
                                             class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm px-3 py-1.5 rounded-full mr-2 mb-2 transition-colors">
-                                                {{ $category->translations->first()->category_name }}
+                                                {{ $categoryTranslation->category_name }}
                                             </a>
+                                            @endif
                                         @endforeach
                                     </div>
                                 </div>
@@ -262,26 +274,29 @@
                                     <h3 class="text-lg font-semibold mb-3 border-b pb-2">Related Posts</h3>
                                     <div class="space-y-4">
                                         @foreach($relatedPosts as $relatedPost)
+                                            @php $relatedTranslation = $relatedPost->translations->first(); @endphp
+                                            @if($relatedTranslation)
                                             <div class="flex">
-                                                @if($relatedPost->translations->first()->image_thumbnail)
-                                                    <a href="{{ route('insights.show', $relatedPost->translations->first()->slug) }}" class="flex-shrink-0 mr-3">
+                                                @if($relatedTranslation->image_thumbnail)
+                                                    <a href="{{ route('insights.show', $relatedTranslation->slug) }}" class="flex-shrink-0 mr-3">
                                                         <div class="w-16 h-16 rounded overflow-hidden">
-                                                            <img src="{{ asset('storage/' . config('insights.blog_upload_dir') . '/image_thumbnail/' . $relatedPost->translations->first()->image_thumbnail) }}"
-                                                                alt="{{ $relatedPost->translations->first()->title }}"
+                                                            <img src="{{ asset('storage/' . config('insights.blog_upload_dir') . '/image_thumbnail/' . $relatedTranslation->image_thumbnail) }}"
+                                                                alt="{{ $relatedTranslation->title }}"
                                                                 class="w-full h-full object-cover">
                                                         </div>
                                                     </a>
                                                 @endif
                                                 <div>
                                                     <h4 class="font-medium text-sm">
-                                                        <a href="{{ route('insights.show', $relatedPost->translations->first()->slug) }}" 
+                                                        <a href="{{ route('insights.show', $relatedTranslation->slug) }}" 
                                                            class="text-gray-900 hover:text-blue-600">
-                                                            {{ $relatedPost->translations->first()->title }}
+                                                            {{ $relatedTranslation->title }}
                                                         </a>
                                                     </h4>
                                                     <span class="text-xs text-gray-500">{{ $relatedPost->posted_at->format('M j, Y') }}</span>
                                                 </div>
                                             </div>
+                                            @endif
                                         @endforeach
                                     </div>
                                 </div>

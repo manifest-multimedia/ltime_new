@@ -10,7 +10,8 @@ class Post extends Model
     protected $fillable = ['user_id', 'posted_at', 'is_published'];
     
     protected $casts = [
-        'posted_at' => 'datetime'
+        'posted_at' => 'datetime',
+        'is_published' => 'boolean'
     ];
 
     public function translations()
@@ -31,5 +32,50 @@ class Post extends Model
     public function user()
     {
         return $this->belongsTo(\App\Models\User::class);
+    }
+
+    /**
+     * Get the translations relationship with a safety check to return an empty collection if null
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function getTranslationsAttribute()
+    {
+        // If translations relation is loaded but null, return empty collection instead
+        if (array_key_exists('translations', $this->relations) && $this->relations['translations'] === null) {
+            return collect();
+        }
+        
+        // Otherwise return the normal relation value
+        return $this->getRelationValue('translations');
+    }
+    
+    /**
+     * Get the first translation or null if no translations exist
+     *
+     * @return mixed
+     */
+    public function getFirstTranslationAttribute()
+    {
+        return $this->translations->first();
+    }
+    
+    /**
+     * Get the current translation based on the current locale or first available
+     *
+     * @return mixed
+     */
+    public function getCurrentTranslationAttribute()
+    {
+        $currentLang = \App\Models\Insights\Language::where('iso_code', app()->getLocale())->first();
+        
+        if ($currentLang) {
+            $translation = $this->translations->where('lang_id', $currentLang->id)->first();
+            if ($translation) {
+                return $translation;
+            }
+        }
+        
+        return $this->first_translation;
     }
 }

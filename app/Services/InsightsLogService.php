@@ -14,7 +14,8 @@ class InsightsLogService
 
     public function logPostCreated(Post $post, User $user)
     {
-        $this->log('info', "Post created: {$post->translations->first()->title}", [
+        $title = $post->translations->first() ? $post->translations->first()->title : 'Untitled Post';
+        $this->log('info', "Post created: {$title}", [
             'post_id' => $post->id,
             'user_id' => $user->id,
             'user_name' => $user->name,
@@ -23,7 +24,8 @@ class InsightsLogService
 
     public function logPostUpdated(Post $post, User $user)
     {
-        $this->log('info', "Post updated: {$post->translations->first()->title}", [
+        $title = $post->translations->first() ? $post->translations->first()->title : 'Untitled Post';
+        $this->log('info', "Post updated: {$title}", [
             'post_id' => $post->id,
             'user_id' => $user->id,
             'user_name' => $user->name,
@@ -32,7 +34,8 @@ class InsightsLogService
 
     public function logPostDeleted(Post $post, User $user)
     {
-        $this->log('info', "Post deleted: {$post->translations->first()->title}", [
+        $title = $post->translations && $post->translations->first() ? $post->translations->first()->title : 'Untitled Post';
+        $this->log('info', "Post deleted: {$title}", [
             'post_id' => $post->id,
             'user_id' => $user->id,
             'user_name' => $user->name,
@@ -41,7 +44,8 @@ class InsightsLogService
 
     public function logPostPublished(Post $post, User $user)
     {
-        $this->log('info', "Post published: {$post->translations->first()->title}", [
+        $title = $post->translations->first() ? $post->translations->first()->title : 'Untitled Post';
+        $this->log('info', "Post published: {$title}", [
             'post_id' => $post->id,
             'user_id' => $user->id,
             'user_name' => $user->name,
@@ -50,7 +54,8 @@ class InsightsLogService
 
     public function logCommentCreated(Comment $comment)
     {
-        $this->log('info', "New comment on post: {$comment->post->translations->first()->title}", [
+        $title = $comment->post && $comment->post->translations->first() ? $comment->post->translations->first()->title : 'Untitled Post';
+        $this->log('info', "New comment on post: {$title}", [
             'comment_id' => $comment->id,
             'post_id' => $comment->post_id,
             'author_name' => $comment->author_name,
@@ -60,7 +65,8 @@ class InsightsLogService
 
     public function logCommentApproved(Comment $comment, User $moderator)
     {
-        $this->log('info', "Comment approved on post: {$comment->post->translations->first()->title}", [
+        $title = $comment->post && $comment->post->translations->first() ? $comment->post->translations->first()->title : 'Untitled Post';
+        $this->log('info', "Comment approved on post: {$title}", [
             'comment_id' => $comment->id,
             'post_id' => $comment->post_id,
             'moderator_id' => $moderator->id,
@@ -70,7 +76,8 @@ class InsightsLogService
 
     public function logCommentDeleted(Comment $comment, User $moderator)
     {
-        $this->log('info', "Comment deleted from post: {$comment->post->translations->first()->title}", [
+        $title = $comment->post && $comment->post->translations->first() ? $comment->post->translations->first()->title : 'Untitled Post';
+        $this->log('info', "Comment deleted from post: {$title}", [
             'comment_id' => $comment->id,
             'post_id' => $comment->post_id,
             'moderator_id' => $moderator->id,
