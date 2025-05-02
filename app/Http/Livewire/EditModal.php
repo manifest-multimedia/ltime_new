@@ -7,10 +7,6 @@ use App\Models\Testimonial;
 
 class EditModal extends Component
 {
-    protected $listeners = [
-        'editModal' => 'edit',
-    ]; 
-
     public $testimonial_id;
     public $testimonial_author;
     public $testimonial_role;
@@ -19,8 +15,8 @@ class EditModal extends Component
     public $testimonial_company;
     public $testimonial_rating; 
    
-
-    public function mount(){
+    public function mount(): void
+    {
         $this->testimonial_author='';
         $this->testimonial_message='';
         $this->testimonial_photo='';
@@ -33,7 +29,9 @@ class EditModal extends Component
         return view('livewire.edit-modal');
     }
 
-    public function edit($testimonial_id){
+    #[On('editModal')]
+    public function edit($testimonial_id): void
+    {
         $testimonial=Testimonial::findOrfail($testimonial_id);
         
         $this->testimonial_id=$testimonial->id ?? '';
@@ -44,12 +42,10 @@ class EditModal extends Component
         $this->testimonial_company=$testimonial->company ?? 'error';
         $this->testimonial_photo=$testimonial->photo ?? 'error';
         $this->testimonial_rating=$testimonial->rating ?? 'error';
-
-       
-
     }
 
-    public function update(){
+    public function update(): void
+    {
         $update=Testimonial::where('id',$this->testimonial_id)->update([
             'name'=>$this->testimonial_author,
             'role'=>$this->testimonial_role,
@@ -57,9 +53,8 @@ class EditModal extends Component
             'company'=>$this->testimonial_company,
             'photo'=>$this->testimonial_photo,
             'rating'=>$this->testimonial_rating,
-
         ]);
 
-        $this->emit('testimonialUpdated');
+        $this->dispatch('testimonialUpdated');
     }
 }
