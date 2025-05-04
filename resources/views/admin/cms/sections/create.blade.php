@@ -9,7 +9,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
-                    <form method="POST" action="{{ route('admin.cms-pages.sections.store', $page) }}">
+                    <form method="POST" action="{{ route('cms-pages.sections.store', $page) }}">
                         @csrf
 
                         <div class="mb-6">
@@ -64,7 +64,7 @@
                         </div>
 
                         <div class="flex items-center justify-end mt-6">
-                            <a href="{{ route('admin.cms-pages.edit', $page) }}" class="text-gray-500 mr-4">Cancel</a>
+                            <a href="{{ route('cms-pages.edit', $page) }}" class="text-gray-500 mr-4">Cancel</a>
                             <x-button>
                                 {{ __('Create Section') }}
                             </x-button>
