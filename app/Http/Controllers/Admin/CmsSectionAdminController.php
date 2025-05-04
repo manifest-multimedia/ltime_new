@@ -18,7 +18,7 @@ class CmsSectionAdminController extends Controller
     public function index(string $pageId): RedirectResponse
     {
         $page = CmsPage::findOrFail($pageId);
-        return redirect()->route('admin.cms-pages.edit', $page);
+        return redirect()->route('cms-pages.edit', $page);
     }
 
     /**
@@ -59,7 +59,7 @@ class CmsSectionAdminController extends Controller
         
         $section = $page->sections()->create($validated);
         
-        return redirect()->route('admin.sections.edit', $section)
+        return redirect()->route('sections.edit', $section)
             ->with('success', 'Section created successfully.');
     }
 
@@ -100,7 +100,7 @@ class CmsSectionAdminController extends Controller
         
         $section->update($validated);
         
-        return redirect()->route('admin.sections.edit', $section)
+        return redirect()->route('sections.edit', $section)
             ->with('success', 'Section updated successfully.');
     }
 
@@ -114,7 +114,7 @@ class CmsSectionAdminController extends Controller
         
         $section->delete();
         
-        return redirect()->route('admin.cms-pages.edit', $pageId)
+        return redirect()->route('cms-pages.edit', $pageId)
             ->with('success', 'Section deleted successfully.');
     }
     
