@@ -1,75 +1,80 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Add New Section to') }}: {{ $page->title }}
-        </h2>
-    </x-slot>
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="mb-4">{{ __('Add New Section to') }}: {{ $page->title }}</h2>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <form method="POST" action="{{ route('cms-pages.sections.store', $page) }}">
+                            @csrf
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-                <div class="p-6 bg-white border-b border-gray-200">
-                    <form method="POST" action="{{ route('cms-pages.sections.store', $page) }}">
-                        @csrf
-
-                        <div class="mb-6">
-                            <x-label for="type" value="{{ __('Section Type') }}" />
-                            <select id="type" class="block mt-1 w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm" name="type" required>
-                                <option value="">Select a section type</option>
-                                @foreach($sectionTypes as $value => $name)
-                                    <option value="{{ $value }}" {{ old('type') == $value ? 'selected' : '' }}>{{ $name }}</option>
-                                @endforeach
-                            </select>
-                            <span class="text-gray-500 text-sm">The section type determines the layout and appearance</span>
-                            @error('type')
-                                <span class="text-red-600 text-sm mt-1">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <div class="mb-6">
-                            <x-label for="title" value="{{ __('Section Title') }} (Optional)" />
-                            <x-input id="title" class="block mt-1 w-full" type="text" name="title" :value="old('title')" />
-                            <span class="text-gray-500 text-sm">This may be displayed depending on the section type</span>
-                            @error('title')
-                                <span class="text-red-600 text-sm mt-1">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            <div>
-                                <x-label for="background_color" value="{{ __('Background Color') }} (Optional)" />
-                                <x-input id="background_color" class="block mt-1 w-full" type="text" name="background_color" :value="old('background_color')" placeholder="E.g. gray-100, white, blue-50" />
-                                <span class="text-gray-500 text-sm">Use Tailwind CSS color classes</span>
-                                @error('background_color')
-                                    <span class="text-red-600 text-sm mt-1">{{ $message }}</span>
+                            <div class="mb-3">
+                                <label for="type" class="form-label">{{ __('Section Type') }}</label>
+                                <select id="type" class="form-select @error('type') is-invalid @enderror" name="type" required>
+                                    <option value="">Select a section type</option>
+                                    @foreach($sectionTypes as $value => $name)
+                                        <option value="{{ $value }}" {{ old('type') == $value ? 'selected' : '' }}>{{ $name }}</option>
+                                    @endforeach
+                                </select>
+                                <div class="form-text">The section type determines the layout and appearance</div>
+                                @error('type')
+                                    <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
-                            <div>
-                                <x-label for="text_color" value="{{ __('Text Color') }} (Optional)" />
-                                <x-input id="text_color" class="block mt-1 w-full" type="text" name="text_color" :value="old('text_color')" placeholder="E.g. #333333 or rgb(51,51,51)" />
-                                @error('text_color')
-                                    <span class="text-red-600 text-sm mt-1">{{ $message }}</span>
+                            <div class="mb-3">
+                                <label for="title" class="form-label">{{ __('Section Title') }} (Optional)</label>
+                                <input id="title" class="form-control @error('title') is-invalid @enderror" type="text" name="title" value="{{ old('title') }}">
+                                <div class="form-text">This may be displayed depending on the section type</div>
+                                @error('title')
+                                    <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                        </div>
 
-                        <div class="mb-6">
-                            <x-label for="settings" value="{{ __('Additional Settings') }} (Optional)" />
-                            <textarea id="settings" class="block mt-1 w-full border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 rounded-md shadow-sm font-mono" name="settings" rows="4" placeholder="{&#10;  &quot;key&quot;: &quot;value&quot;&#10;}">{{ old('settings') }}</textarea>
-                            <span class="text-gray-500 text-sm">JSON format. Leave empty if not needed</span>
-                            @error('settings')
-                                <span class="text-red-600 text-sm mt-1">{{ $message }}</span>
-                            @enderror
-                        </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="background_color" class="form-label">{{ __('Background Color') }} (Optional)</label>
+                                    <input id="background_color" class="form-control @error('background_color') is-invalid @enderror" 
+                                           type="text" name="background_color" value="{{ old('background_color') }}" 
+                                           placeholder="E.g. bg-light, bg-primary, #f8f9fa">
+                                    <div class="form-text">Use Bootstrap background classes or hex values</div>
+                                    @error('background_color')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
 
-                        <div class="flex items-center justify-end mt-6">
-                            <a href="{{ route('cms-pages.edit', $page) }}" class="text-gray-500 mr-4">Cancel</a>
-                            <x-button>
-                                {{ __('Create Section') }}
-                            </x-button>
-                        </div>
-                    </form>
+                                <div class="col-md-6">
+                                    <label for="text_color" class="form-label">{{ __('Text Color') }} (Optional)</label>
+                                    <input id="text_color" class="form-control @error('text_color') is-invalid @enderror" 
+                                           type="text" name="text_color" value="{{ old('text_color') }}" 
+                                           placeholder="E.g. text-dark, text-primary, #212529">
+                                    <div class="form-text">Use Bootstrap text classes or hex values</div>
+                                    @error('text_color')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="settings" class="form-label">{{ __('Additional Settings') }} (Optional)</label>
+                                <textarea id="settings" class="form-control font-monospace @error('settings') is-invalid @enderror" 
+                                          name="settings" rows="4" 
+                                          placeholder='{
+  "key": "value"
+}'>{{ old('settings') }}</textarea>
+                                <div class="form-text">JSON format. Leave empty if not needed</div>
+                                @error('settings')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="d-flex justify-content-end mt-4">
+                                <a href="{{ route('cms-pages.edit', $page) }}" class="btn btn-secondary me-2">Cancel</a>
+                                <button type="submit" class="btn btn-primary">{{ __('Create Section') }}</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
