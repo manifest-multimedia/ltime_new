@@ -46,7 +46,7 @@
                                             <td>
                                                 <div class="btn-group btn-group-sm">
                                                     <a href="{{ route('cms-pages.edit', $page) }}" class="btn btn-outline-primary">Edit</a>
-                                                    <a href="{{ route('page.show', $page->slug) }}" target="_blank" class="btn btn-outline-info">View</a>
+                                                    <a href="{{ url('/cms/' . $page->slug . ($page->status !== 'published' ? '?preview=1' : '')) }}" target="_blank" class="btn btn-outline-info">View</a>
                                                     <form method="POST" action="{{ route('cms-pages.destroy', $page) }}" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this page?');">
                                                         @csrf
                                                         @method('DELETE')

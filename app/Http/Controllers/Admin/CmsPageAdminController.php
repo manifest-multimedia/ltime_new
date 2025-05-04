@@ -50,7 +50,7 @@ class CmsPageAdminController extends Controller
      */
     public function show(CmsPage $cmsPage)
     {
-        return redirect()->route('page.show', $cmsPage->slug);
+        return redirect(url('/cms/' . $cmsPage->slug));
     }
 
     /**

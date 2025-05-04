@@ -11,7 +11,7 @@
                         <p class="lead mb-4">This is the default welcome page. To replace this page, create a CMS page with the slug 'home'.</p>
                         <hr class="my-4">
                         <p>If you're an administrator, you can create and manage content through the CMS.</p>
-                        <a href="{{ route('cms-pages.index') }}" class="btn btn-primary mt-3">Manage CMS Pages</a>
+                        <a href="{{ url('/cms/admin/cms-pages') }}" class="btn btn-primary mt-3">Manage CMS Pages</a>
                     </div>
                 </div>
             </div>

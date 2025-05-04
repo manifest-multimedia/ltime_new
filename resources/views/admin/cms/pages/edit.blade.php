@@ -2,7 +2,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
         <h2 class="h2">{{ __('Edit Page') }}: {{ $cmsPage->title }}</h2>
         <div>
-            <a href="{{ route('page.show', $cmsPage->slug) }}" target="_blank" class="btn btn-secondary">
+            <a href="{{ url('/cms/' . $cmsPage->slug . ($cmsPage->status !== 'published' ? '?preview=1' : '')) }}" target="_blank" class="btn btn-secondary">
                 View Page
             </a>
         </div>

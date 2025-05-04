@@ -12,14 +12,23 @@ class CmsPageController extends Controller
      * Display a CMS page by its slug
      *
      * @param string $slug
+     * @param Request $request
      * @return View
      */
-    public function show(string $slug): View
+    public function show(string $slug, Request $request): View
     {
-        $page = CmsPage::where('slug', $slug)
-            ->where('status', 'published')
-            ->with(['sections.contentBlocks'])
-            ->firstOrFail();
+        // Check if this is a preview request from the admin panel
+        $isPreview = $request->has('preview') && auth()->check() && auth()->user()->can('viewDraft', CmsPage::class);
+        
+        $query = CmsPage::where('slug', $slug)
+            ->with(['sections.contentBlocks']);
+            
+        // If not a preview request, only show published pages
+        if (!$isPreview) {
+            $query->where('status', 'published');
+        }
+        
+        $page = $query->firstOrFail();
 
         return view('cms.page', compact('page'));
     }
@@ -31,12 +40,20 @@ class CmsPageController extends Controller
      */
     public function home(): View
     {
+        // First try to find a published home page
         $page = CmsPage::where('slug', 'home')
             ->where('status', 'published')
             ->with(['sections.contentBlocks'])
             ->first();
+            
+        // If no published home page exists, try to find any home page regardless of status
+        if (!$page) {
+            $page = CmsPage::where('slug', 'home')
+                ->with(['sections.contentBlocks'])
+                ->first();
+        }
 
-        // If no home page is defined, show a default welcome page
+        // If no home page is defined at all, show a default welcome page
         if (!$page) {
             return view('welcome');
         }
