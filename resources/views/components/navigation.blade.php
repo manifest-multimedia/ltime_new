@@ -6,7 +6,7 @@
         <i class="icon-bar"></i>
     </div>
     <nav class="main-menu navbar-expand-md navbar-dark">
-        <div class=" navbar-collapse show clearfix" id="navbarSupportedContent">
+        <div class="navbar-collapse show clearfix" id="navbarSupportedContent">
             <ul class="navigation clearfix">
                 <li class="{{ url()->current() === url('/') ? 'current' : ''}}"><a href="/"><span>Home</span></a>
                    

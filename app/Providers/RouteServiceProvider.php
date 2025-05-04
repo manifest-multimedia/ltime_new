@@ -17,7 +17,7 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string
      */
-    public const HOME = '/dashboard';
+    public const HOME = '/portal/dashboard';
 
     /**
      * Define your route model bindings, pattern filters, and other route configuration.
@@ -35,8 +35,8 @@ class RouteServiceProvider extends ServiceProvider
 
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
-               
-    
+                
+ 
             Route::middleware('web')
                 ->group(base_path('routes/fortify.php'));
 
@@ -45,7 +45,11 @@ class RouteServiceProvider extends ServiceProvider
 
             Route::middleware('web')
                 ->group(base_path('routes/insights.php'));
-        });
+                  // Load CMS routes without the 'cms.' prefix for route names to avoid duplication
+   Route::middleware('web')
+   ->prefix('cms')
+   ->group(base_path('routes/cms.php'));
+});
     }
 
     /**

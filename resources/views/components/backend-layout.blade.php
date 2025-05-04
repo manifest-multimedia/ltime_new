@@ -127,7 +127,7 @@
     <!--  END NAVBAR  -->
 
     <!--  BEGIN MAIN CONTAINER  -->
-    <div class="main-container" id="container">
+    <div class="main-container" id="container" style="padding: 50px 50px 0; margin: 50px 50px 0;">
 
         <div class="overlay"></div>
         <div class="search-overlay"></div>
