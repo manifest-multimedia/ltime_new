@@ -9,7 +9,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
-                    <form method="POST" action="{{ route('admin.sections.content-blocks.store', $section) }}" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('sections.content-blocks.store', $section) }}" enctype="multipart/form-data">
                         @csrf
 
                         <div class="mb-6">
@@ -88,7 +88,7 @@
                         </div>
 
                         <div class="flex items-center justify-end mt-6">
-                            <a href="{{ route('admin.sections.edit', $section) }}" class="text-gray-500 mr-4">Cancel</a>
+                            <a href="{{ route('sections.edit', $section) }}" class="text-gray-500 mr-4">Cancel</a>
                             <x-button>
                                 {{ __('Create Content Block') }}
                             </x-button>

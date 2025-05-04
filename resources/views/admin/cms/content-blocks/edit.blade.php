@@ -5,7 +5,7 @@
                 {{ __('Edit Content Block') }}: {{ $contentBlock->title ?: 'Block '.$contentBlock->id }}
             </h2>
             <div>
-                <a href="{{ route('admin.sections.edit', $contentBlock->section) }}" class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-500 active:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                <a href="{{ route('sections.edit', $contentBlock->section) }}" class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-500 active:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">
                     Back to Section
                 </a>
             </div>
@@ -22,7 +22,7 @@
                         </div>
                     @endif
                     
-                    <form method="POST" action="{{ route('admin.content-blocks.update', $contentBlock) }}" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('content-blocks.update', $contentBlock) }}" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
 
@@ -108,7 +108,7 @@
                         </div>
 
                         <div class="flex items-center justify-end mt-6">
-                            <a href="{{ route('admin.sections.edit', $contentBlock->section) }}" class="text-gray-500 mr-4">Cancel</a>
+                            <a href="{{ route('sections.edit', $contentBlock->section) }}" class="text-gray-500 mr-4">Cancel</a>
                             <x-button>
                                 {{ __('Update Content Block') }}
                             </x-button>

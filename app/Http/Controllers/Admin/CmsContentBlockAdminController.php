@@ -19,7 +19,7 @@ class CmsContentBlockAdminController extends Controller
     public function index(string $sectionId): RedirectResponse
     {
         $section = CmsSection::findOrFail($sectionId);
-        return redirect()->route('admin.sections.edit', $section);
+        return redirect()->route('sections.edit', $section);
     }
 
     /**
@@ -71,7 +71,7 @@ class CmsContentBlockAdminController extends Controller
         
         $contentBlock = $section->contentBlocks()->create($validated);
         
-        return redirect()->route('admin.sections.edit', $section)
+        return redirect()->route('sections.edit', $section)
             ->with('success', 'Content block created successfully.');
     }
 
@@ -126,7 +126,7 @@ class CmsContentBlockAdminController extends Controller
         
         $contentBlock->update($validated);
         
-        return redirect()->route('admin.sections.edit', $contentBlock->section)
+        return redirect()->route('sections.edit', $contentBlock->section)
             ->with('success', 'Content block updated successfully.');
     }
 
@@ -145,7 +145,7 @@ class CmsContentBlockAdminController extends Controller
         
         $contentBlock->delete();
         
-        return redirect()->route('admin.sections.edit', $section)
+        return redirect()->route('sections.edit', $section)
             ->with('success', 'Content block deleted successfully.');
     }
     
